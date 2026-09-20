@@ -14,17 +14,17 @@ A primer, then seven drills, then one unguided scenario.
 
 **Lessons 1 to 7.** Hints available on every one.
 
-1. Edit a file, then `git status`
-2. Staging: `git add`
-3. Save the change: `git commit`
-4. The history: `git log`
-5. Off the laptop: `git push`
-6. A teammate got there first: `git pull`
-7. Undo a bad commit: `git revert`
+1. What did I just change: `git status`
+2. Pick what goes in the save: `git add`
+3. Make the save point: `git commit`
+4. Your save slots: `git log`
+5. Cloud save: `git push`
+6. Bence saved over you: `git pull`
+7. Load the last good save: `git revert`
 
-Lesson 6 is where the drama starts. The teammate's second commit contains a plausible typo (`max-width: 900px` becomes `90px`) that visibly wrecks the layout in the preview pane the moment the student pulls it. Lesson 7 has them find it in the log and revert it.
+Lesson 6 is where the drama starts. Bence is the teammate, and his second commit contains a plausible typo (`max-width: 900px` becomes `90px`) that visibly wrecks the layout in the preview pane the moment the student pulls it. Lesson 7 has them find it in the log and revert it.
 
-**Lesson 8, "The site is down".** No hints. The team lead asks for a bigger font, the student pushes it, the phone rings, and they have to roll it back themselves. Five steps tick green as they get there, and the last one un-ticks if they break it again.
+**Lesson 8, "The site is down".** No hints, and the broken commit is the student's own rather than Bence's. The team lead asks for a bigger font, the student pushes it, the phone rings, and they have to roll it back themselves. Five steps tick green as they get there, and the last one un-ticks if they break it again.
 
 ## Scope decisions, on purpose
 
@@ -36,7 +36,11 @@ Read this before adding anything.
 
 **Six commands total.** `status`, `add`, `commit`, `log`, `push`, `pull`, `revert`. Every command added is one more thing a beginner has to hold in their head.
 
-**English.** The repo name is Hungarian, the app is not.
+**English.** The repo name is Hungarian, the app is not. Bence is the one Hungarian word in it, on purpose.
+
+**One metaphor, carried all the way through.** A commit is a save point, `git log` is the save slots, `git revert` loads an older save, `git push` is the cloud save, `git pull` downloads the other player's saves, and Bence saving over you is what makes lesson 6 land. The primer opens on it and every lesson after keeps the same words. New copy uses that vocabulary or it weakens the parts that already do.
+
+**Bence stays out of the engine.** He is named in lesson text and in the `git blame` reply only. Command output keeps matching real git, because that is what students meet next week.
 
 ## Architecture
 
@@ -80,8 +84,8 @@ The `sandbox` attribute is bare, with no value. That blocks scripts, which matte
 ## Tests
 
 ```
-npm test         # engine: 84 checks, runs in a vm, no DOM
-npm run test:ui  # UI: 110 checks, jsdom, walks the whole app end to end
+npm test         # engine: 89 checks, runs in a vm, no DOM
+npm run test:ui  # UI: 112 checks, jsdom, walks the whole app end to end
 ```
 
 The UI suite clicks through the primer, does every lesson in order, reads hashes out of the rendered terminal, feeds them back to `git revert`, checks the preview's `srcdoc` after each change, and verifies the progress code survives a round trip. Both suites read `index.html` directly, so there is nothing to keep in sync.
@@ -106,9 +110,11 @@ This is a development tool and is deliberately not part of `npm test`.
 
 **Add a primer slide.** Append to `PRIMER` with a `title`, a `body` and an `art` key naming a function in the `ART` object in the UI block. Drawings are inline SVG on a 640-wide viewBox. Below 560px they stop scaling and the container scrolls, because the labels become unreadable otherwise.
 
+**Add a non-git reply.** `SHELL` maps a bare command name (`sudo`, `rm`, `vim`, `ls`, `npm`) to the lines the terminal prints instead of `command not found`. Unlisted commands still get the shell error, which two tests check. Each reply is dry and also true about the real command, so a student who types it for a laugh still leaves with something. `git blame` is the same idea inside the git switch.
+
 **Add a git command.** Add a `case` to the switch in `execGit`. Match real git's output text closely, including its error messages, since students will meet the real thing next week and should recognise what they see. Read the scope section first.
 
-**Writing style.** Lesson and primer text is read by beginners under mild stress. Short sentences, one idea each, no em dashes.
+**Writing style.** Lesson and primer text is read by beginners under mild stress. Short sentences, one idea each, no em dashes. The tone stays dry. The save-system vocabulary above does the personality work. No memes, no references to a specific game, because both date fast and the ones who do not get them feel it.
 
 ## Teaching notes
 

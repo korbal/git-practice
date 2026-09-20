@@ -117,7 +117,7 @@
   <header>
     <div class="brand">
       <h1>Git Practice</h1>
-      <div class="sub">add &rarr; commit &rarr; push, visually</div>
+      <div class="sub">save your work, break it, get it back</div>
     </div>
     <div class="dots" id="dots"></div>
     <button class="btn" id="btn-why">Why git?</button>
@@ -478,12 +478,31 @@
     return hits.length === 1 ? hits[0] : null;
   }
 
+  // Not taught and not advertised. Answers for the things students type to see what happens,
+  // each one true about the real command so the joke leaves something behind.
+  var SHELL = {
+    sudo:  ["sudo: this is a browser tab. There is nothing here to be root of."],
+    rm:    ["rm: nothing happened, this terminal is a simulation.",
+            "In a real one it would have happened immediately and without asking. Worth remembering."],
+    vim:   ["There is no vim here, so you are free to go.",
+            "One day there will be. To get out: Esc, then :q! and Enter."],
+    nano:  ["No editor needed. Click a file chip on the left."],
+    ls:    ["The four boxes on the left are doing that already, in colour."],
+    cd:    ["There is one folder and you are in it."],
+    npm:   ["That would be 1,200 packages and four minutes. Not today."],
+    open:  ["The preview under the boxes is already showing you the page."],
+    help:  ["The Hint button on the right is the help you are after."]
+  };
+
   function execGit(S, raw){
     var out = [];
     var line = String(raw || "").trim();
     if (!line) return { out: out };
     var toks = tokenize(line);
-    if (toks[0] !== "git") return { out: ["bash: " + toks[0] + ": command not found"] };
+    if (toks[0] !== "git"){
+      if (SHELL[toks[0]]) return { out: SHELL[toks[0]].slice() };
+      return { out: ["bash: " + toks[0] + ": command not found"] };
+    }
     if (toks.length === 1) return { out: ["usage: git <command> [<args>]"] };
     var cmd = toks[1], argv = toks.slice(2), branch = S.branch, h = S.branches[branch];
 
@@ -629,6 +648,9 @@
       }
 
       case "push": {
+        if (argv.some(function(a){ return a === "-f" || a === "--force"; })){
+          out.push("(--force ignored here. On a real team it is how you delete somebody's afternoon.)");
+        }
         var local = S.branches[branch], rem = S.origin[branch];
         if (rem === undefined){
           S.origin[branch] = local;
@@ -767,6 +789,11 @@
         break;
       }
 
+      case "blame":
+        out.push("It was Bence.");
+        out.push("It is usually Bence. Real git blame shows who last touched each line of a file, which is how you find out for certain.");
+        break;
+
       default:
         out.push("git: '" + (cmd || "") + "' is not a git command. See 'git --help'.");
     }
@@ -784,43 +811,43 @@
       body: "Not maybe. Everyone does, including people who have done this for twenty years. The only question is how long it takes you to get back to a version that worked.<br><br>Without a save system your options are Ctrl+Z until you close the editor, or a folder full of files named <span class=\"mono\">final</span>, <span class=\"mono\">final-2</span> and <span class=\"mono\">REAL-final</span> that nobody can tell apart a week later. You have probably already done the second one.",
       art: "folders" },
     { title: "The words you are about to meet",
-      body: "Git has its own names for the save-system ideas you already understand. None of them are complicated, they are just unfamiliar. You do not have to memorise this slide, you will use all of it in the next twenty minutes.<br><br>One thing that trips up everybody: <b>git</b> is the tool running on your laptop. <b>GitHub</b> is a website that keeps a copy. Two different things with annoyingly similar names.",
+      body: "Git has its own names for the save-system ideas you already understand. None of them are complicated, they are just unfamiliar. You do not have to memorise this slide, you will use all of it in the next twenty minutes.<br><br>One thing that trips up everybody: <b>git</b> is the tool on your laptop, so it holds your local saves. <b>GitHub</b> is a website that keeps a copy, so it is the cloud save. Two different things with annoyingly similar names.",
       art: "glossary" },
     { title: "Every commit is a save point",
       body: "A commit is you telling git: this version works, remember it. Git keeps all of them, each with a message saying what changed and why.<br><br>When something breaks, you pick a save point and go back to it. That is the promise, and you will do exactly that in lesson 7 with a broken page in front of you.",
       art: "timeline" },
     { title: "Your code lives in two places",
-      body: "A change travels through four boxes on its way to safety. You edit in the <b>working directory</b>. <span class=\"mono\">git add</span> moves the change to <b>staging</b>, the pile of things you are about to save. <span class=\"mono\">git commit</span> turns that pile into a save point in your <b>local repo</b>. <span class=\"mono\">git push</span> copies it to <b>GitHub</b>.<br><br>Why bother with four? Because the last one is the one that survives. Laptop dies, coffee lands on the keyboard, your work is still on GitHub. These four boxes sit on the left of every lesson from here on.",
+      body: "A change travels through four boxes on its way to safety. You edit in the <b>working directory</b>. <span class=\"mono\">git add</span> moves the change to <b>staging</b>, the pile of things you are about to save. <span class=\"mono\">git commit</span> turns that pile into a save point in your <b>local repo</b>. <span class=\"mono\">git push</span> uploads it to <b>GitHub</b>, which is the cloud save.<br><br>Why bother with four? Because the last one is the one that survives. Laptop dies, coffee lands on the keyboard, your work is still on GitHub. These four boxes sit on the left of every lesson from here on.",
       art: "boxes" },
     { title: "This is the job",
-      body: "Every development team you will ever join runs on git. It is the machinery that lets two people edit the same project on the same day without overwriting each other's work.<br><br>It is also the portfolio people open. A GitHub profile shows what you build and how you work, which is more than a CV can say.<br><br>The good news is how little you need. Six commands cover most working days, and you are about to use every one of them.",
+      body: "Every development team you will ever join runs on git. Two people, one project, same afternoon, and neither of them saves over the other. Co-op, with a save system underneath it.<br><br>It is also the portfolio people open. A GitHub profile shows what you build and how you work, which is more than a CV can say.<br><br>The good news is how little you need. Six commands cover most working days, and you are about to use every one of them.",
       art: "commands" }
   ];
 
   var LESSONS = [
-    { num:1, title:"Edit a file, then git status", hasHints:true,
-      goal:"You just inherited this project. Click <b>index.html</b> in the Working directory box, change something (the heading is a good start), and save. Then ask git what it noticed: <span class=\"mono\">git status</span>",
+    { num:1, title:"What did I just change: git status", hasHints:true,
+      goal:"You just inherited this project from the group before you. Click <b>index.html</b> in the Working directory box, change something (the heading is a good start), and save. Then ask git what it noticed: <span class=\"mono\">git status</span>",
       hints:["Clicking the index.html chip opens the file editor.","After saving, watch the preview under the boxes change, and the chip turn orange.","git status is the command you run most. It answers: what did I change, and what have I not saved yet?"] },
-    { num:2, title:"Staging: git add", hasHints:true,
-      goal:"Your change is only in the Working directory. Move it to <b>Staging</b>, the pile of things you are about to save: <span class=\"mono\">git add index.html</span> and then <span class=\"mono\">git status</span> again.",
-      hints:["git add picks which changes go into the next save point.","After git add, the file shows up in the Staging box, in blue.","git status now lists it under \"Changes to be committed\"."] },
-    { num:3, title:"Save the change: git commit", hasHints:true,
+    { num:2, title:"Pick what goes in the save: git add", hasHints:true,
+      goal:"Your change is only in the Working directory, where nothing is protecting it. Move it to <b>Staging</b>, the pile of things going into the next save: <span class=\"mono\">git add index.html</span> and then <span class=\"mono\">git status</span> again.",
+      hints:["git add picks which changes go into the next save point. You will not always want all of them.","After git add, the file shows up in the Staging box, in blue.","git status now lists it under \"Changes to be committed\"."] },
+    { num:3, title:"Make the save point: git commit", hasHints:true,
       goal:"Turn what you staged into a save point: <span class=\"mono\">git commit -m \"your message\"</span>",
       hints:["After -m comes the message, in quotes. Write what changed and why, for the you of next month.","Example: git commit -m \"New homepage heading\"","Run git status afterwards: the working tree should be clean."] },
-    { num:4, title:"The history: git log", hasHints:true,
-      goal:"Look at every save point this project has: <span class=\"mono\">git log --oneline</span>",
-      hints:["git log lists commits newest first: a hash (the id) and the message.","Your commit is on top, and the ones you inherited are underneath it.","Those hashes are how you point at a commit later. You will need one in lesson 7."] },
-    { num:5, title:"Off the laptop: git push", hasHints:true,
-      goal:"Your commit only exists on this machine. Send it to <b>GitHub</b>: <span class=\"mono\">git push</span>",
-      hints:["git push copies your local commits up to the server (box 4).","Before the push, git status says you are \"ahead of origin/main\".","After the push it says \"up to date\", and your work survives a dead laptop."] },
-    { num:6, title:"A teammate got there first: git pull", hasHints:true,
-      goal:"While you were working, a teammate pushed <b>2 commits</b>. Fetch them: <span class=\"mono\">git pull</span><br><br>Then look at the preview. Something is wrong with the page.",
-      hints:["git pull downloads the commits from GitHub into your local repo and your files.","Pull before you start working and before you push. It saves arguments.","Once it lands, compare the preview with what it looked like a second ago."] },
-    { num:7, title:"Undo a bad commit: git revert", hasHints:true,
-      goal:"Your teammate's second commit broke the layout, and it is already on GitHub, so you cannot just delete it. You <b>undo</b> it instead:<br><br>1. <span class=\"mono\">git log --oneline</span> and find the commit that broke it<br>2. <span class=\"mono\">git revert &lt;hash&gt;</span> using that commit's hash<br>3. <span class=\"mono\">git push</span>",
-      hints:["Look for the commit called \"Tweak page width\". Copy its hash, the short code at the start of the line.","git revert does not erase history. It adds a new commit that undoes the old one, which is why it is safe on work that is already pushed.","After the revert the preview should look right again. Then push, so GitHub gets the fix too."] },
+    { num:4, title:"Your save slots: git log", hasHints:true,
+      goal:"Open the save list. Every save point this project has, newest first: <span class=\"mono\">git log --oneline</span>",
+      hints:["Each line is one save slot: a hash (its id) and the message whoever made it wrote.","Yours is on top, and the ones you inherited are underneath it.","Those hashes are how you point at an old save later. You will need one in lesson 7."] },
+    { num:5, title:"Cloud save: git push", hasHints:true,
+      goal:"Your save points exist on this laptop only, and laptops die. Send them up to <b>GitHub</b>: <span class=\"mono\">git push</span>",
+      hints:["git push uploads your local save points to the server (box 4).","Before the push, git status says you are \"ahead of origin/main\": the cloud copy is behind you.","After the push it says \"up to date\", and a dead laptop costs you nothing."] },
+    { num:6, title:"Bence saved over you: git pull", hasHints:true,
+      goal:"You are not working on this alone. While you were busy, <b>Bence</b> pushed <b>2 commits</b> of his own. Download them: <span class=\"mono\">git pull</span><br><br>Then look at the preview. Bence has done something.",
+      hints:["git pull downloads the other person's save points into your local repo and your files.","Pull before you start working and before you push. It saves arguments.","Once it lands, compare the preview with what it looked like ten seconds ago."] },
+    { num:7, title:"Load the last good save: git revert", hasHints:true,
+      goal:"Bence's second commit broke the layout, and it is already on GitHub, so you cannot quietly delete it. You <b>undo</b> it instead:<br><br>1. <span class=\"mono\">git log --oneline</span> and find the commit that broke it<br>2. <span class=\"mono\">git revert &lt;hash&gt;</span> using that commit's hash<br>3. <span class=\"mono\">git push</span>",
+      hints:["Look for the one called \"Tweak page width\". Bence's commit messages are all like that. Copy its hash, the short code at the start of the line.","git revert does not erase history. It adds a new save point that undoes the old one, which is why it is safe on work other people already have.","After the revert the preview should look right again. Then push, so the cloud save gets the fix too."] },
     { num:8, title:"The site is down", hasHints:false,
-      goal:"Real one now, no hints.<br><br>Your team lead asks for a bigger font on the homepage. You open <b>style.css</b>, set the body <span class=\"mono\">font-size</span> to <span class=\"mono\">60px</span>, save, commit and push it.<br><br>Then the phone rings: the live site is unreadable. Get it back to how it was, on GitHub, using what you learned in lesson 7.",
+      goal:"Real one now, no hints.<br><br>Your team lead asks for a bigger font on the homepage. You open <b>style.css</b>, set the body <span class=\"mono\">font-size</span> to <span class=\"mono\">60px</span>, save, commit and push it.<br><br>Then the phone rings: the live site is unreadable. This one is yours, not Bence's. Get it back to how it was, on GitHub, using what you did in lesson 7.",
       hints:[],
       steps:["style.css changed and committed","The broken commit pushed to GitHub","Bad commit found in git log","git revert run on that commit","The fix pushed: GitHub is back to a working site"] }
   ];
@@ -974,10 +1001,10 @@
         ["a save point", "a commit"],
         ["the note you put on the save", "a commit message"],
         ["your list of saves", "git log"],
-        ["going back to an old save", "git revert"],
+        ["loading an older save", "git revert"],
         ["the folder git is watching", "a repository (“repo”)"],
-        ["the copy that lives online", "GitHub (the “remote”)"],
-        ["sending it up / getting it down", "git push / git pull"]
+        ["the cloud save", "GitHub (the “remote”)"],
+        ["uploading yours / downloading theirs", "git push / git pull"]
       ];
       var s = '<svg viewBox="0 0 640 246" role="img" aria-label="Everyday words on the left matched to the git word for each on the right">';
       s += '<text x="248" y="16" font-size="12" font-weight="700" fill="#6b7280" text-anchor="end">What you would call it</text>';
@@ -1033,7 +1060,7 @@
     },
     boxes: function(){
       var names = ["Working directory","Staging","Local repo","GitHub"];
-      var subs = ["you edit here","what you picked","your save points","the safe copy"];
+      var subs = ["you edit here","what you picked","your save points","the cloud save"];
       var cmds = ["git add","git commit","git push"];
       var s = '<svg viewBox="0 0 640 200" role="img" aria-label="Four boxes: working directory, staging, local repo and GitHub, joined by git add, git commit and git push">';
       names.forEach(function(n,i){
@@ -1049,12 +1076,12 @@
           s += '<text x="' + (ax + 12) + '" y="140" font-size="11" font-family="ui-monospace,monospace" fill="#f05a28" text-anchor="middle">' + cmds[i] + '</text>';
         }
       });
-      s += '<text x="320" y="178" font-size="12" fill="#6b7280" text-anchor="middle">git pull brings box 4 back down to box 1 when a teammate pushed something.</text>';
+      s += '<text x="320" y="178" font-size="12" fill="#6b7280" text-anchor="middle">git pull brings box 4 back down to box 1 when someone else saved before you.</text>';
       return s + '</svg>';
     },
     commands: function(){
       var rows = [["git status","what did I change?"],["git add","pick what to save"],["git commit","save it, with a note"],
-                  ["git push","copy it to GitHub"],["git pull","get the team's work"],["git revert","undo a bad commit"]];
+                  ["git push","cloud save it"],["git pull","download the team's saves"],["git revert","load the last good one"]];
       var s = '<svg viewBox="0 0 640 220" role="img" aria-label="The six git commands this course teaches and what each one does">';
       rows.forEach(function(r,i){
         var col = i % 2, row = Math.floor(i / 2);
@@ -1334,8 +1361,9 @@
       "<ul>" +
       "<li><span class=\"mono\">git status</span>: what did I change?</li>" +
       "<li><span class=\"mono\">git add</span> and <span class=\"mono\">git commit -m \"...\"</span>: make a save point</li>" +
-      "<li><span class=\"mono\">git push</span> and <span class=\"mono\">git pull</span>: swap work with GitHub and your team</li>" +
-      "<li><span class=\"mono\">git revert &lt;hash&gt;</span>: undo a commit that is already pushed</li>" +
+      "<li><span class=\"mono\">git push</span>: cloud save, so a dead laptop costs you nothing</li>" +
+      "<li><span class=\"mono\">git pull</span>: get everyone else's saves before they get in your way</li>" +
+      "<li><span class=\"mono\">git revert &lt;hash&gt;</span>: load the last good save, even when the bad one is already public</li>" +
       "</ul>" +
       "<p>Next: do the same on a <b>real</b> repository, in a real terminal. Make a repo on GitHub, clone it, " +
       "change one file, and run the loop until it is boring. Boring is the goal.</p>" +
