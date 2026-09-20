@@ -1,0 +1,4 @@
+node_modules/
+
+# Screenshots from shot.js are build artefacts, not source.
+*.png

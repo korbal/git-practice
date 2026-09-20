@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git Practice</title>
+<style>
+  :root { --accent:#f05a28; --ink:#1c2430; --muted:#6b7280; --line:#e3e6ea; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:#f6f7f9; }
+  .mono { font-family: ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace; }
+  .app { max-width:1200px; margin:0 auto; padding:16px; }
+  header { display:flex; align-items:center; gap:16px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:12px; }
+  .brand h1 { font-size:20px; margin:0; }
+  .brand .sub { color:var(--muted); font-size:12px; margin-top:2px; }
+  .dots { display:flex; gap:6px; align-items:center; flex:1; }
+  .dot { width:10px; height:10px; border-radius:50%; background:#dfe3e8; }
+  .dot.done { background:var(--accent); }
+  .dot.cur { outline:2px solid var(--accent); outline-offset:2px; }
+  .btn { border:1px solid #d3d7dd; background:#fff; color:var(--ink); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; }
+  .btn:hover { border-color:var(--accent); }
+  .btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:16px; margin-top:16px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .box-title { font-weight:700; font-size:14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+  .box-title .num { width:22px; height:22px; border-radius:6px; background:#f1f3f5; display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:var(--muted); }
+  .arrow { text-align:center; color:#9aa0a6; font-size:14px; line-height:1; margin:6px 0; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; min-height:34px; align-items:flex-start; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid #d3d7dd; border-radius:8px; background:#fafafa; font-size:13px; }
+  .chip.clickable { cursor:pointer; }
+  .chip.clickable:hover { border-color:var(--accent); }
+  .chip.mod { background:#fff7ed; border-color:#fcd8ae; }
+  .chip.staged { background:#eff6ff; border-color:#bcd4f9; }
+  .chip .st { width:8px; height:8px; border-radius:50%; flex:none; }
+  .st.clean { background:#2e9e5b; }
+  .st.mod { background:#e07c2a; }
+  .st.staged { background:#3b82f6; }
+  .empty { color:#9aa0a6; font-size:13px; font-style:italic; }
+  .commit-card { border:1px solid var(--line); border-radius:10px; padding:8px 12px; background:#fafbfc; }
+  .commit-card .hash { color:var(--accent); font-weight:700; }
+  .commit-card .msg { font-size:13px; margin-top:2px; }
+  .repoline { font-size:13px; padding:4px 0; }
+  .repoline code { background:#f1f3f5; border-radius:5px; padding:1px 5px; }
+  .pill { display:inline-block; font-size:11px; border-radius:10px; padding:1px 7px; margin-left:6px; background:#eef2f6; color:#45536b; vertical-align:middle; }
+  .pill.head { background:var(--accent); color:#fff; }
+  .graph { }
+  .grow { padding:3px 0; font-size:13px; display:flex; align-items:center; gap:8px; }
+  .grow .nd { width:10px; height:10px; border-radius:50%; background:#c9cfd6; border:2px solid #fff; box-shadow:0 0 0 1px #c9cfd6; flex:none; margin-left:0; }
+  .grow.head .nd { background:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .grow .hsh { color:#6b7280; font-size:12px; }
+  .grow .msg { color:var(--ink); }
+  .grow .edge { border-left:1px dashed #dfe3e8; margin-left:4px; padding-left:10px; }
+  .legend { font-size:11px; color:var(--muted); margin-top:10px; display:flex; gap:12px; flex-wrap:wrap; }
+  .legend span { display:inline-flex; align-items:center; gap:5px; }
+  .lcol { display:flex; flex-direction:column; gap:16px; }
+  .lesson-top { display:flex; gap:10px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  .lesson-title { font-size:17px; font-weight:800; margin:0; flex:1; }
+  .goal { font-size:14px; line-height:1.55; background:#f6f8fa; border-radius:10px; padding:10px 12px; }
+  .goal b { font-weight:700; }
+  .state { margin-top:10px; font-size:13px; }
+  .state .ok { color:#2e9e5b; font-weight:700; }
+  .state .wait { color:#b45309; }
+  .hintbox { background:#fff8e6; border:1px solid #f5e2b0; border-radius:8px; padding:8px 10px; font-size:13px; margin-top:10px; }
+  .steps { list-style:none; padding-left:4px; margin:10px 0 0; display:flex; flex-direction:column; gap:6px; }
+  .steps li { font-size:13px; color:#9aa0a6; display:flex; gap:8px; align-items:center; }
+  .steps li.done { color:#2e9e5b; }
+  .steps li .boxx { width:14px; height:14px; border:1px solid #d3d7dd; border-radius:4px; flex:none; display:inline-flex; align-items:center; justify-content:center; font-size:10px; }
+  .steps li.done .boxx { background:#2e9e5b; border-color:#2e9e5b; color:#fff; }
+  .buttons { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .term { background:#15181f; color:#d4d4d4; border-radius:12px; padding:12px; font-size:13px; display:flex; flex-direction:column; gap:6px; }
+  .term .bar { display:flex; gap:6px; align-items:center; color:#777f8c; font-size:11px; padding-bottom:6px; border-bottom:1px solid #262d38; margin-bottom:4px; }
+  .term .bar span { width:10px; height:10px; border-radius:50%; }
+  .termout { max-height:260px; overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+  .term .cli { color:#98c379; white-space:pre-wrap; word-break:break-word; }
+  .term .out { color:#d4d4d4; white-space:pre-wrap; word-break:break-word; }
+  .terml { display:flex; gap:8px; align-items:center; }
+  .terml .pm { color:#98c379; flex:none; }
+  .term input { background:transparent; border:none; outline:none; color:#fff; font-family:inherit; font-size:13px; width:100%; caret-color:var(--accent); color:gold; }
+  .ckline { display:flex; gap:6px; flex-direction:column; font-size:14px; }
+  .fin { font-size:14px; line-height:1.6; }
+  .fin ul { margin:8px 0; padding-left:20px; }
+  .modal-back { position:fixed; inset:0; background:rgba(15,18,24,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:16px; }
+  .modal-back.open { display:flex; }
+  .modal { background:#fff; border-radius:12px; padding:18px; width:min(680px,94vw); max-height:90vh; overflow:auto; }
+  .modal h3 { margin:0 0 10px; }
+  .modal p { font-size:13px; color:var(--muted); margin:6px 0 12px; }
+  textarea { width:100%; min-height:150px; font-family:ui-monospace,monospace; font-size:13px; border:1px solid #d3d7dd; border-radius:8px; padding:8px; box-sizing:border-box; resize:vertical; }
+  .errorshow { font-family:ui-monospace,monospace; font-size:13px; color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:8px 12px; white-space:pre-wrap; word-break:break-word; margin-top:10px; display:none; }
+  .errorshow.open { display:block; }
+  .sub { font-size:12px; color:var(--muted); }
+  .preview-frame { width:100%; height:300px; border:1px solid var(--line); border-radius:8px; background:#fff; display:block; }
+  .preview-note { font-size:11px; color:var(--muted); margin-top:8px; }
+  .primer-card { max-width:760px; margin:24px auto; }
+  .primer-kicker { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+  .primer-title { font-size:24px; margin:6px 0 14px; }
+  .primer-art { background:#fbfcfd; border:1px solid var(--line); border-radius:10px; padding:10px; overflow-x:auto; }
+  /* Below ~560px the labels inside the drawings shrink past readable, so the
+     drawing keeps its size and the box scrolls sideways instead. */
+  .primer-art svg { width:100%; min-width:560px; height:auto; display:block; }
+  .primer-body { font-size:15px; line-height:1.65; margin:14px 0 0; }
+  /* Only shown at the widths where the drawing actually gets clipped. */
+  .primer-scrollhint { display:none; font-size:11px; color:var(--muted); margin-top:6px; }
+  @media (max-width:620px){ .primer-scrollhint { display:block; } }
+  .primer-nav { display:flex; gap:8px; align-items:center; margin-top:18px; flex-wrap:wrap; }
+  .pdots { display:flex; gap:6px; flex:1; }
+  .pdot { width:9px; height:9px; border-radius:50%; background:#dfe3e8; cursor:pointer; }
+  .pdot.cur { background:var(--accent); }
+  .rcol { display:flex; flex-direction:column; gap:16px; }
+  /* Stacked on one column, the instructions and terminal have to come first,
+     otherwise the student scrolls past four boxes to find out what to do. */
+  @media (max-width:1020px){ .grid { grid-template-columns:1fr; } .rcol { order:-1; } .primer-card { margin:12px auto; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <h1>Git Practice</h1>
+      <div class="sub">add &rarr; commit &rarr; push, visually</div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <button class="btn" id="btn-why">Why git?</button>
+    <button class="btn" id="btn-code">Copy progress</button>
+    <button class="btn" id="btn-paste">Paste code</button>
+    <button class="btn" id="btn-reset">&#8635; Reset</button>
+  </header>
+
+  <div id="primer" style="display:none;"></div>
+
+  <div class="grid" id="main-grid">
+    <div class="lcol" id="lcol">
+      <div class="card">
+        <div class="box-title"><span class="num">1</span> Working directory <span class="mono sub">(where you work)</span></div>
+        <div class="chips" id="box-work"></div>
+        <div class="arrow">&#8595;</div>
+        <div class="box-title"><span class="num">2</span> Staging <span class="mono sub">(&#34;git add&#34; puts files here)</span></div>
+        <div class="chips" id="box-stage"></div>
+        <div class="arrow">&#8595;</div>
+        <div class="box-title"><span class="num">3</span> Local repo <span class="mono sub">(&#34;git commit&#34; puts files here)</span></div>
+        <div id="box-local" class="chips"></div>
+        <div class="arrow">&#8595;</div>
+        <div class="box-title"><span class="num">4</span> GitHub <span class="mono sub">(&#34;git push&#34; puts files here)</span></div>
+        <div id="box-gh" class="chips"></div>
+        <div class="legend">
+          <span><span class="st clean"></span> unchanged</span>
+          <span><span class="st mod"></span> modified (not staged)</span>
+          <span><span class="st staged"></span> staged (ready to commit)</span>
+          <span>click a file to edit it</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="box-title">Live preview <span class="mono sub">(your working directory, rendered)</span></div>
+        <iframe class="preview-frame" id="preview" sandbox title="Preview of index.html"></iframe>
+        <div class="preview-note">This is index.html with style.css applied. Scripts never run here.</div>
+      </div>
+
+      <div class="card">
+        <div class="box-title">Commits</div>
+        <div class="graph" id="graph"></div>
+      </div>
+    </div>
+
+    <div class="rcol">
+      <div class="card">
+        <div class="lesson-top">
+          <h2 class="lesson-title" id="lesson-title"></h2>
+          <span class="mono sub" id="lesson-num"></span>
+        </div>
+        <div class="goal" id="lesson-goal"></div>
+        <div id="lesson-steps"></div>
+        <div class="state" id="lesson-state"></div>
+        <div class="hintbox" id="lesson-hint" style="display:none;"></div>
+        <div class="errorshow" id="lesson-err"></div>
+        <div class="buttons" id="lesson-buttons"></div>
+      </div>
+
+      <div class="card term">
+        <div class="bar"><span style="background:#ff5f57;"></span><span style="background:#febc2e;"></span><span style="background:#28c840;"></span>&nbsp; terminal</div>
+        <div class="termout" id="termout"></div>
+        <div class="terml"><span class="pm">$</span><input id="term-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="git status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="modal-editor">
+  <div class="modal">
+    <h3>Edit file: <span class="mono" id="ed-name"></span></h3>
+    <p>Saving marks the file as &#34;modified&#34; in the Working directory, and the <span class="mono">git status</span> command will show it.</p>
+    <textarea id="ed-text"></textarea>
+    <div class="buttons">
+      <button class="btn primary" id="ed-save">Save</button>
+      <button class="btn" id="ed-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="modal-code">
+  <div class="modal">
+    <h3>Progress code</h3>
+    <p>Copy this code to continue on another machine. There, press the &#8222;Paste code&#8221; button, paste it in, and restore.</p>
+    <textarea id="code-text"></textarea>
+    <div class="buttons">
+      <button class="btn" id="code-copy">Copy code</button>
+      <button class="btn" id="code-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="modal-paste">
+  <div class="modal">
+    <h3>Restore progress</h3>
+    <p>Paste in a previously saved code here. <b>Careful:</b> your current progress will be overwritten.</p>
+    <textarea id="paste-text" placeholder="pasted code..."></textarea>
+    <div class="buttons">
+      <button class="btn primary" id="paste-load">Restore</button>
+      <button class="btn" id="paste-close">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script id="engine">
+(function(){
+  "use strict";
+  /*__ENGINE_START__*/
+  var W = typeof window !== "undefined" ? window : this;
+
+  // ---- The project the student inherits: a small team website with real history.
+  var F1_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Team website</title>\n</head>\n<body>\n  <h1>Welcome to our website!</h1>\n</body>\n</html>";
+  var F1_CSS  = "body {\n  font-family: sans-serif;\n  max-width: 900px;\n  margin: 0 auto;\n}";
+
+  var F2_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Team website</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <h1>Welcome to our website!</h1>\n</body>\n</html>";
+
+  var F3_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Team website</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <nav>\n    <a href=\"index.html\">Home</a>\n    <a href=\"#work\">Work</a>\n  </nav>\n  <h1>Welcome to our website!</h1>\n</body>\n</html>";
+  var F3_CSS  = "body {\n  font-family: sans-serif;\n  max-width: 900px;\n  margin: 0 auto;\n  color: #1c2430;\n}\nnav {\n  display: flex;\n  gap: 16px;\n  padding: 12px 0;\n}\nnav a {\n  color: #f05a28;\n  text-decoration: none;\n}";
+
+  var F4_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Team website</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <nav>\n    <a href=\"index.html\">Home</a>\n    <a href=\"#work\">Work</a>\n  </nav>\n  <header class=\"hero\">\n    <h1>Welcome to our website!</h1>\n    <p>We build small, fast websites.</p>\n  </header>\n</body>\n</html>";
+  var F4_CSS  = F3_CSS + "\n.hero {\n  padding: 32px 0;\n  border-bottom: 1px solid #e3e6ea;\n}\n.hero h1 {\n  margin: 0 0 8px;\n  font-size: 32px;\n}";
+
+  var F5_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Team website</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <nav>\n    <a href=\"index.html\">Home</a>\n    <a href=\"#work\">Work</a>\n  </nav>\n  <header class=\"hero\">\n    <h1>Welcome to our website!</h1>\n    <p>We build small, fast websites.</p>\n  </header>\n  <section id=\"work\">\n    <h2>Our work</h2>\n    <ul>\n      <li>Bakery landing page</li>\n      <li>Photographer portfolio</li>\n      <li>School event site</li>\n    </ul>\n  </section>\n</body>\n</html>";
+  var F5_CSS  = F4_CSS + "\n#work ul {\n  line-height: 1.8;\n}";
+
+  var F6_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Team website</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <nav>\n    <a href=\"index.html\">Home</a>\n    <a href=\"#work\">Work</a>\n  </nav>\n  <header class=\"hero\">\n    <h1>Welcome to our website!</h1>\n    <p>We build small, fast websites.</p>\n  </header>\n  <section id=\"work\">\n    <h2>Our work</h2>\n    <ul>\n      <li>Bakery landing page</li>\n      <li>Photographer portfolio</li>\n      <li>School event site</li>\n    </ul>\n  </section>\n  <footer>\n    <p>&copy; 2026 Team website</p>\n  </footer>\n</body>\n</html>";
+  var F6_CSS  = F5_CSS + "\nfooter {\n  margin-top: 32px;\n  color: #6b7280;\n  font-size: 13px;\n}";
+
+  var F7_HTML = F6_HTML.split("Team website").join("Pixel Team").split("Welcome to our website!").join("Pixel Team");
+
+  var HISTORY = [
+    { msg: "Initial commit",
+      set: { "index.html": F1_HTML, "style.css": F1_CSS,
+             "script.js": "console.log(\"hi website!\");",
+             "README.md": "# Team website\n\nA school project built with git." } },
+    { msg: "Link the stylesheet",        set: { "index.html": F2_HTML } },
+    { msg: "Add navigation bar",         set: { "index.html": F3_HTML, "style.css": F3_CSS } },
+    { msg: "Add hero section",           set: { "index.html": F4_HTML, "style.css": F4_CSS } },
+    { msg: "List our work",              set: { "index.html": F5_HTML, "style.css": F5_CSS } },
+    { msg: "Add footer",                 set: { "index.html": F6_HTML, "style.css": F6_CSS } },
+    { msg: "Rename the site to Pixel Team",
+      set: { "index.html": F7_HTML, "README.md": "# Pixel Team\n\nA school project built with git." } },
+    { msg: "Flesh out the README",
+      set: { "README.md": "# Pixel Team\n\nA school project built with git.\n\n## Pages\n\n- index.html - home page\n\n## Run it\n\nOpen index.html in a browser." } }
+  ];
+
+  function rnd(){ return ("0000000" + Math.floor(Math.random() * 67108863).toString(16)).slice(-7); }
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  function newGame(){
+    var S = {
+      commits: {},
+      branches: { main: null },
+      branch: "main",
+      index: {},
+      working: {},
+      origin: {},
+      done: [false,false,false,false,false,false,false,false],
+      subgoalFlags: [false,false,false,false,false],
+      ran: { edited:false, status:false, add:false, commit:false, log:false, push:false, pull:false,
+             revert:false, branch:false, switch:false, merge:false },
+      lessonIndex: 0,
+      primerDone: false,
+      teamworkPushed: false,
+      scenarioBase: null,
+      scenarioLogged: false
+    };
+    // Replay the inherited history so git log has something real in it from minute one.
+    var tree = {}, parent = null;
+    HISTORY.forEach(function(h){
+      Object.keys(h.set).forEach(function(n){ tree[n] = h.set[n]; });
+      var id = rnd();
+      S.commits[id] = { msg: h.msg, tree: clone(tree), parent: parent };
+      parent = id;
+    });
+    S.branches.main = parent;
+    S.origin.main = parent;           // the inherited history is already on GitHub
+    S.index = clone(tree);
+    S.working = clone(tree);
+    return S;
+  }
+
+  function normalize(S){
+    if (!S || !S.commits || !S.branches || !S.branches.main) return newGame();
+    var n = LESSONS.length;
+    var d = [];
+    for (var i = 0; i < n; i++) d.push(false);
+    (S.done || []).forEach(function(v,i){ if (i < n && v) d[i] = true; });
+    S.done = d;
+    S.subgoalFlags = (S.subgoalFlags || []).slice(0, 5);
+    while (S.subgoalFlags.length < 5) S.subgoalFlags.push(false);
+    S.ran = Object.assign({ edited:false, status:false, add:false, commit:false, log:false, push:false,
+                            pull:false, revert:false, branch:false, switch:false, merge:false }, S.ran || {});
+    if (typeof S.lessonIndex !== "number" || S.lessonIndex < 0 || S.lessonIndex > n) S.lessonIndex = 0;
+    if (typeof S.primerDone !== "boolean") S.primerDone = false;
+    if (typeof S.teamworkPushed !== "boolean") S.teamworkPushed = false;
+    if (typeof S.scenarioLogged !== "boolean") S.scenarioLogged = false;
+    if (!(S.scenarioBase in (S.commits || {}))) S.scenarioBase = S.scenarioBase || null;
+    if (!S.origin) S.origin = {};
+    if (!S.index) S.index = {};
+    if (!S.working) S.working = {};
+    return S;
+  }
+
+  function head(S){ return S.branches[S.branch]; }
+  function treeOf(S, cid){ return S.commits[cid] ? S.commits[cid].tree : {}; }
+  function isAncestor(S, a, b){
+    var c = b;
+    while (c){ if (c === a) return true; c = S.commits[c].parent; }
+    return false;
+  }
+  function distance(S, from, to){
+    var n = 0, c = from;
+    while (c && c !== to){ c = S.commits[c].parent; n++; }
+    return c ? n : -1;
+  }
+
+  // Longest common subsequence of two line arrays, so a one-line insert
+  // reports as one insert instead of shifting every line below it.
+  function lcsCount(a, b){
+    var n = a.length, m = b.length;
+    if (!n || !m) return 0;
+    var prev = new Array(m + 1).fill(0), cur = new Array(m + 1).fill(0);
+    for (var i = 1; i <= n; i++){
+      cur[0] = 0;
+      for (var j = 1; j <= m; j++){
+        cur[j] = a[i-1] === b[j-1] ? prev[j-1] + 1 : Math.max(prev[j], cur[j-1]);
+      }
+      var swap = prev; prev = cur; cur = swap;
+    }
+    return prev[m];
+  }
+
+  function diffStat(oldTree, newTree){
+    var names = {};
+    Object.keys(oldTree).forEach(function(n){ names[n] = true; });
+    Object.keys(newTree).forEach(function(n){ names[n] = true; });
+    var rows = [], fc = 0, ins = 0, del = 0;
+    Object.keys(names).forEach(function(n){
+      var a = oldTree[n], b = newTree[n];
+      if ((a || "") === (b || "")) return;
+      var al = a === undefined ? [] : a.split("\n");
+      var bl = b === undefined ? [] : b.split("\n");
+      var common = lcsCount(al, bl);
+      var aa = bl.length - common, dd = al.length - common;
+      fc++; ins += aa; del += dd;
+      var total = aa + dd;
+      // Same 20-column cap real git uses, scaled so the bar stays readable.
+      var shown = Math.min(total, 20), pluses = total ? Math.round(aa / total * shown) : 0;
+      var bar = Array(pluses + 1).join("+") + Array(shown - pluses + 1).join("-");
+      rows.push("  " + n + " | " + total + " " + bar);
+    });
+    var fw = fc === 1 ? "file" : "files";
+    var sum = " " + fc + " " + fw + " changed";
+    if (ins > 0) sum += ", " + ins + " insertion" + (ins === 1 ? "" : "s") + "(+)";
+    if (del > 0) sum += ", " + del + " deletion" + (del === 1 ? "" : "s") + "(-)";
+    return { lines: rows, summary: sum };
+  }
+
+  // Moves the working directory + index from oldTree to newTree.
+  // Returns the name of a locally modified file if that would clobber the student's work.
+  function applyTree(S, oldTree, newTree){
+    var names = {};
+    Object.keys(oldTree).forEach(function(n){ names[n] = true; });
+    Object.keys(newTree).forEach(function(n){ names[n] = true; });
+    var touched = [];
+    Object.keys(names).forEach(function(n){
+      if ((oldTree[n] || "") !== (newTree[n] || "")) touched.push(n);
+    });
+    for (var i = 0; i < touched.length; i++){
+      var n = touched[i];
+      if ((S.working[n] || "") !== (oldTree[n] || "")) return n;
+    }
+    touched.forEach(function(n){
+      if (n in newTree){ S.working[n] = newTree[n]; S.index[n] = newTree[n]; }
+      else { delete S.working[n]; delete S.index[n]; }
+    });
+    return null;
+  }
+
+  function relOf(S, branch){
+    var loc = S.branches[branch], rem = S.origin[branch];
+    if (rem === undefined) return { known:false };
+    if (loc === rem) return { known:true, ahead:0, behind:0 };
+    if (isAncestor(S, rem, loc)) return { known:true, ahead:distance(S, loc, rem), behind:0 };
+    if (isAncestor(S, loc, rem)) return { known:true, ahead:0, behind:distance(S, rem, loc) };
+    return { known:true, ahead:0, behind:0, diverge:true };
+  }
+
+  function statusText(S){
+    var L = [], branch = S.branch, h = head(S), ht = treeOf(S, h);
+    L.push("On branch " + branch);
+    var staged = [], unstaged = [];
+    Object.keys(S.index).forEach(function(n){
+      if ((S.index[n] || "") !== (ht[n] || "")) staged.push(n);
+    });
+    Object.keys(S.working).forEach(function(n){
+      if ((S.working[n] || "") !== (S.index[n] || "")) unstaged.push(n);
+    });
+    var rel = relOf(S, branch);
+    if (rel.known && !rel.diverge){
+      if (rel.ahead > 0){
+        L.push("Your branch is ahead of 'origin/" + branch + "' by " + rel.ahead + " commit" + (rel.ahead===1?"":"s") + ".");
+        L.push("  (use \"git push\" to publish your local commits)");
+      } else if (rel.behind > 0){
+        L.push("Your branch is behind 'origin/" + branch + "' by " + rel.behind + " commit" + (rel.behind===1?"":"s") + ", and can be fast-forwarded.");
+        L.push("  (use \"git pull\" to update your local branch)");
+      } else {
+        L.push("Your branch is up to date with 'origin/" + branch + "'.");
+      }
+    }
+    L.push("");
+    if (staged.length){
+      L.push("Changes to be committed:");
+      L.push("  (use \"git restore --staged <file>...\" to unstage)");
+      staged.forEach(function(n){ L.push("\t" + (n in ht ? "modified" : "new file") + ":   " + n); });
+      L.push("");
+    }
+    if (unstaged.length){
+      L.push("Changes not staged for commit:");
+      L.push("  (use \"git add <file>...\" to update what will be committed)");
+      unstaged.forEach(function(n){ L.push("\tmodified:   " + n); });
+      L.push("");
+    }
+    if (!staged.length && !unstaged.length) L.push("nothing to commit, working tree clean");
+    else L.push("no changes added to commit (use \"git add\" and/or \"git commit -a\")");
+    return L.join("\n");
+  }
+
+  function tokenize(line){
+    var t = [], i = 0;
+    while (i < line.length){
+      while (i < line.length && /\s/.test(line[i])) i++;
+      if (i >= line.length) break;
+      var cur = "", q = null;
+      while (i < line.length){
+        var c = line[i];
+        if (q){ if (c === q){ q = null; i++; break; } cur += c; i++; }
+        else if (c === "\"" || c === "'"){ q = c; i++; }
+        else if (/\s/.test(c)) break;
+        else { cur += c; i++; }
+      }
+      t.push(cur);
+    }
+    return t;
+  }
+
+  function editFile(S, name, content){
+    S.working[name] = content;
+    S.ran.edited = true;
+  }
+
+  // Which commit does "HEAD" / "a1b2c3d" / a unique prefix point at?
+  function resolveRev(S, ref){
+    if (!ref) return null;
+    if (ref === "HEAD") return head(S);
+    if (ref in S.commits) return ref;
+    var hits = Object.keys(S.commits).filter(function(id){ return id.indexOf(ref) === 0; });
+    return hits.length === 1 ? hits[0] : null;
+  }
+
+  function execGit(S, raw){
+    var out = [];
+    var line = String(raw || "").trim();
+    if (!line) return { out: out };
+    var toks = tokenize(line);
+    if (toks[0] !== "git") return { out: ["bash: " + toks[0] + ": command not found"] };
+    if (toks.length === 1) return { out: ["usage: git <command> [<args>]"] };
+    var cmd = toks[1], argv = toks.slice(2), branch = S.branch, h = S.branches[branch];
+
+    switch (cmd){
+      case "status":
+        out.push(statusText(S));
+        S.ran.status = true;
+        break;
+
+      case "add": {
+        var adds = argv.filter(function(a){ return a !== "-" && !a.startsWith("-"); });
+        if (!adds.length){
+          out.push("Nothing specified, nothing added.");
+          out.push("Maybe you wanted to say 'git add .'?");
+        } else {
+          var given = adds[0];
+          if (given === "."){
+            Object.keys(S.working).forEach(function(n){ S.index[n] = S.working[n]; });
+            S.ran.add = true;
+          } else if (!(given in S.working)){
+            out.push("error: pathspec '" + given + "' did not match any file(s) known to git");
+          } else {
+            S.index[given] = S.working[given];
+            S.ran.add = true;
+          }
+        }
+        break;
+      }
+
+      case "commit": {
+        var msg = null;
+        for (var i = 0; i < argv.length; i++){
+          var t = argv[i], nx = argv[i+1];
+          if (t === "-m" || t === "--message"){ msg = nx !== undefined ? nx : ""; i++; }
+          else if (t.indexOf("--message=") === 0) msg = t.slice("--message=".length);
+          else if (t === "-a" || t === "-am"){ Object.keys(S.working).forEach(function(n){ S.index[n] = S.working[n]; }); }
+        }
+        if (msg === null){
+          out.push("error: no commit message provided with -m");
+        } else if (msg === ""){
+          out.push("Aborting commit due to empty commit message.");
+        } else {
+          var stagedChanged = Object.keys(S.index).some(function(n){ return (S.index[n] || "") !== (treeOf(S, h)[n] || ""); });
+          if (!stagedChanged){
+            var dirty = Object.keys(S.working).filter(function(n){ return (S.working[n] || "") !== (S.index[n] || ""); });
+            if (dirty.length){
+              out.push("On branch " + branch);
+              out.push("");
+              out.push("Changes not staged for commit:");
+              out.push("  (use \"git add <file>...\" to update what will be committed)");
+              dirty.forEach(function(n){ out.push("\tmodified:   " + n); });
+              out.push("");
+              out.push("no changes added to commit (use \"git add\" and/or \"git commit -a\")");
+            } else {
+              out.push("nothing to commit, working tree clean");
+            }
+          } else {
+            var oldId = h, newId = rnd();
+            S.commits[newId] = { msg: msg, tree: clone(S.index), parent: oldId };
+            S.branches[branch] = newId;
+            S.ran.commit = true;
+            out.push("[" + branch + " " + newId + "] " + msg);
+            var st = diffStat(treeOf(S, oldId), treeOf(S, newId));
+            st.lines.forEach(function(l){ out.push(l); });
+            out.push(st.summary);
+          }
+        }
+        break;
+      }
+
+      case "log": {
+        if (!h) out.push("fatal: your current branch '" + branch + "' does not have any commits yet");
+        else {
+          var c = h;
+          while (c){ out.push(c + " " + S.commits[c].msg); c = S.commits[c].parent; }
+          S.ran.log = true;
+          // Reading the log while the broken commit is live on GitHub = you found the culprit.
+          if (S.scenarioBase && S.origin[branch] && S.origin[branch] !== S.scenarioBase &&
+              isAncestor(S, S.scenarioBase, S.origin[branch])) S.scenarioLogged = true;
+        }
+        break;
+      }
+
+      case "revert": {
+        var refs = argv.filter(function(a){ return !a.startsWith("-"); });
+        if (!refs.length){
+          out.push("usage: git revert <commit>");
+          out.push("hint: run \"git log\" first and copy the hash of the commit you want to undo.");
+          break;
+        }
+        var target = resolveRev(S, refs[0]);
+        if (!target){ out.push("fatal: bad revision '" + refs[0] + "'"); break; }
+        var par = S.commits[target].parent;
+        if (par === null){
+          out.push("fatal: cannot revert the initial commit (it has nothing before it to go back to)");
+          break;
+        }
+        if (!isAncestor(S, target, h)){
+          out.push("fatal: commit " + target + " is not on the current branch");
+          break;
+        }
+        // Undoing this commit means putting its files back to how its parent had them.
+        var was = treeOf(S, par), became = treeOf(S, target), cur = treeOf(S, h);
+        var touched = [], allNames = {};
+        Object.keys(was).forEach(function(n){ allNames[n] = true; });
+        Object.keys(became).forEach(function(n){ allNames[n] = true; });
+        Object.keys(allNames).forEach(function(n){
+          if ((was[n] || "") !== (became[n] || "")) touched.push(n);
+        });
+        // A later commit touched the same file, so the undo is no longer a clean subtraction.
+        var clash = touched.filter(function(n){ return (cur[n] || "") !== (became[n] || ""); });
+        if (clash.length){
+          out.push("error: could not revert " + target + "... " + S.commits[target].msg);
+          out.push("hint: " + clash[0] + " has changed since that commit, so this revert would conflict.");
+          out.push("hint: revert the most recent commit that broke the file instead.");
+          break;
+        }
+        var dirty = touched.filter(function(n){ return (S.working[n] || "") !== (cur[n] || "") || (S.index[n] || "") !== (cur[n] || ""); });
+        if (dirty.length){
+          out.push("error: your local changes to the following files would be overwritten by revert:");
+          out.push("\t" + dirty[0]);
+          out.push("Please commit your changes or stash them before you revert.");
+          out.push("Aborting");
+          break;
+        }
+        var newTree = clone(cur);
+        touched.forEach(function(n){
+          if (n in was) newTree[n] = was[n];
+          else delete newTree[n];
+        });
+        var rid = rnd(), rmsg = "Revert \"" + S.commits[target].msg + "\"";
+        S.commits[rid] = { msg: rmsg, tree: newTree, parent: h };
+        S.branches[branch] = rid;
+        Object.keys(S.working).forEach(function(n){ if (!(n in newTree)) { delete S.working[n]; delete S.index[n]; } });
+        Object.keys(newTree).forEach(function(n){ S.working[n] = newTree[n]; S.index[n] = newTree[n]; });
+        S.ran.revert = true;
+        S.ran.commit = true;
+        out.push("[" + branch + " " + rid + "] " + rmsg);
+        var rst = diffStat(cur, newTree);
+        rst.lines.forEach(function(l){ out.push(l); });
+        out.push(rst.summary);
+        break;
+      }
+
+      case "push": {
+        var local = S.branches[branch], rem = S.origin[branch];
+        if (rem === undefined){
+          S.origin[branch] = local;
+          out.push("To origin");
+          out.push(" * [new branch]      " + branch + " -> " + branch);
+          out.push("   " + local + ".." + local + "  " + branch + " -> " + branch);
+          S.ran.push = true;
+        } else if (local === rem){
+          out.push("Everything up-to-date");
+        } else if (isAncestor(S, rem, local)){
+          S.origin[branch] = local;
+          out.push("To origin");
+          out.push("   " + rem + ".." + local + "  " + branch + " -> " + branch);
+          S.ran.push = true;
+        } else {
+          out.push("To origin");
+          out.push(" ! [rejected]        " + branch + " -> " + branch + " (fetch first)");
+          out.push("error: failed to push some refs to 'origin'");
+          out.push("hint: Updates were rejected because the remote contains work that you do");
+          out.push("hint: not have locally. This is usually caused by another repository pushing");
+          out.push("hint: to the same ref. You may want to first integrate the remote changes");
+          out.push("hint: (e.g., 'git pull') before pushing again. See the 'Note about");
+          out.push("hint: fast-forwards' in 'git push --help' for details.");
+        }
+        break;
+      }
+
+      case "pull": {
+        var rem2 = S.origin[branch], loc = S.branches[branch];
+        if (rem2 === undefined){
+          out.push("There is no tracking information for the current branch.");
+          out.push("Please specify which branch you want to merge against.");
+          out.push("See git-pull(1) for details.");
+        } else if (loc === rem2 || isAncestor(S, rem2, loc)){
+          out.push("Already up to date.");
+        } else if (isAncestor(S, loc, rem2)){
+          var blob = applyTree(S, treeOf(S, loc), treeOf(S, rem2));
+          if (blob){
+            out.push("error: Your local changes to the following files would be overwritten by merge:");
+            out.push("\t" + blob);
+            out.push("Please commit your changes or stash them before you merge.");
+            out.push("Aborting");
+          } else {
+            S.branches[branch] = rem2;
+            out.push("From origin");
+            out.push("   " + loc + ".." + rem2 + "  " + branch + "     -> origin/" + branch);
+            out.push("Updating " + loc + ".." + rem2);
+            out.push("Fast-forward");
+            var st2 = diffStat(treeOf(S, loc), treeOf(S, rem2));
+            st2.lines.forEach(function(l){ out.push(l); });
+            out.push(st2.summary);
+            S.ran.pull = true;
+          }
+        } else {
+          out.push("error: you and the remote have diverged (a real merge is out of scope in this exercise).");
+          out.push("hint: In real git you would resolve this with 'git pull --rebase' or a merge commit.");
+        }
+        break;
+      }
+
+      // ---- Not taught in this course, kept so a curious student can poke at them.
+      case "branch": {
+        var bname = argv.filter(function(a){ return !a.startsWith("-"); })[0];
+        if (!bname){
+          Object.keys(S.branches).sort().forEach(function(b){ out.push((b === branch ? "* " : "  ") + b); });
+          S.ran.branch = true;
+        } else if (bname in S.branches){
+          out.push("fatal: a branch named '" + bname + "' already exists");
+        } else {
+          S.branches[bname] = h;
+        }
+        break;
+      }
+
+      case "switch":
+      case "checkout": {
+        var create = false, name = null;
+        for (var j = 0; j < argv.length; j++){
+          var a = argv[j];
+          if (a === "-c" || a === "--create" || a === "-b") create = true;
+          else if (!name && !a.startsWith("-")) name = a;
+        }
+        if (!name){
+          out.push(cmd === "switch" ? "fatal: A branch is expected and got none\nDid you forget -c?" : "fatal: missing branch name; try -b");
+          break;
+        }
+        if (create){
+          if (name in S.branches){ out.push("fatal: a branch named '" + name + "' already exists"); break; }
+          S.branches[name] = S.branches[branch];
+          S.branch = name;
+          S.ran.switch = true;
+          break;
+        }
+        if (!(name in S.branches)){ out.push("fatal: invalid reference: " + name); break; }
+        var blob3 = applyTree(S, treeOf(S, S.branches[branch]), treeOf(S, S.branches[name]));
+        if (blob3){
+          out.push("error: Your local changes to the following files would be overwritten by checkout:");
+          out.push("\t" + blob3);
+          out.push("Please commit your changes or stash them before you switch branches.");
+          out.push("Aborting");
+        } else {
+          S.branch = name;
+          S.ran.switch = true;
+        }
+        break;
+      }
+
+      case "merge": {
+        var mname = argv.filter(function(a){ return !a.startsWith("-"); })[0];
+        if (!mname){ out.push("fatal: merge requires an argument"); break; }
+        if (!(mname in S.branches)){ out.push("fatal: merge requires an argument"); out.push(mname + " - not something we can merge"); break; }
+        var mtarget = S.branches[mname], curr = S.branches[branch];
+        if (mname === branch || mtarget === curr || isAncestor(S, mtarget, curr)){
+          out.push("Already up to date.");
+        } else if (isAncestor(S, curr, mtarget)){
+          var blob2 = applyTree(S, treeOf(S, curr), treeOf(S, mtarget));
+          if (blob2){
+            out.push("error: Your local changes to the following files would be overwritten by merge:");
+            out.push("\t" + blob2);
+            out.push("Please commit your changes or stash them before you merge.");
+            out.push("Aborting");
+          } else {
+            S.branches[branch] = mtarget;
+            out.push("Updating " + curr + ".." + mtarget);
+            out.push("Fast-forward");
+            var st3 = diffStat(treeOf(S, curr), treeOf(S, mtarget));
+            st3.lines.forEach(function(l){ out.push(l); });
+            out.push(st3.summary);
+            S.ran.merge = true;
+          }
+        } else {
+          out.push("error: cannot merge '" + mname + "': branches have diverged.");
+          out.push("hint: In real git this would create a merge commit (or a conflict).");
+          out.push("hint: This exercise supports fast-forward merges only.");
+        }
+        break;
+      }
+
+      default:
+        out.push("git: '" + (cmd || "") + "' is not a git command. See 'git --help'.");
+    }
+
+    return { out: out };
+  }
+
+  // ---- The primer: why any of this is worth learning, before a single command.
+  // Slide 1 sets up the save-game analogy and every later slide leans on it.
+  var PRIMER = [
+    { title: "Think of it as a save point",
+      body: "You are deep into a hard game. Before the boss, you <b>save</b>. The boss kills you. You <b>load</b> the save and try again. That is how anyone gets through something hard.<br><br>Writing code is the same job: you try things, and a lot of them break. <b>Git is the save system for your project.</b> That is the entire idea. Everything after this is vocabulary.",
+      art: "savepoints" },
+    { title: "You are going to break it",
+      body: "Not maybe. Everyone does, including people who have done this for twenty years. The only question is how long it takes you to get back to a version that worked.<br><br>Without a save system your options are Ctrl+Z until you close the editor, or a folder full of files named <span class=\"mono\">final</span>, <span class=\"mono\">final-2</span> and <span class=\"mono\">REAL-final</span> that nobody can tell apart a week later. You have probably already done the second one.",
+      art: "folders" },
+    { title: "The words you are about to meet",
+      body: "Git has its own names for the save-system ideas you already understand. None of them are complicated, they are just unfamiliar. You do not have to memorise this slide, you will use all of it in the next twenty minutes.<br><br>One thing that trips up everybody: <b>git</b> is the tool running on your laptop. <b>GitHub</b> is a website that keeps a copy. Two different things with annoyingly similar names.",
+      art: "glossary" },
+    { title: "Every commit is a save point",
+      body: "A commit is you telling git: this version works, remember it. Git keeps all of them, each with a message saying what changed and why.<br><br>When something breaks, you pick a save point and go back to it. That is the promise, and you will do exactly that in lesson 7 with a broken page in front of you.",
+      art: "timeline" },
+    { title: "Your code lives in two places",
+      body: "A change travels through four boxes on its way to safety. You edit in the <b>working directory</b>. <span class=\"mono\">git add</span> moves the change to <b>staging</b>, the pile of things you are about to save. <span class=\"mono\">git commit</span> turns that pile into a save point in your <b>local repo</b>. <span class=\"mono\">git push</span> copies it to <b>GitHub</b>.<br><br>Why bother with four? Because the last one is the one that survives. Laptop dies, coffee lands on the keyboard, your work is still on GitHub. These four boxes sit on the left of every lesson from here on.",
+      art: "boxes" },
+    { title: "This is the job",
+      body: "Every development team you will ever join runs on git. It is the machinery that lets two people edit the same project on the same day without overwriting each other's work.<br><br>It is also the portfolio people open. A GitHub profile shows what you build and how you work, which is more than a CV can say.<br><br>The good news is how little you need. Six commands cover most working days, and you are about to use every one of them.",
+      art: "commands" }
+  ];
+
+  var LESSONS = [
+    { num:1, title:"Edit a file, then git status", hasHints:true,
+      goal:"You just inherited this project. Click <b>index.html</b> in the Working directory box, change something (the heading is a good start), and save. Then ask git what it noticed: <span class=\"mono\">git status</span>",
+      hints:["Clicking the index.html chip opens the file editor.","After saving, watch the preview under the boxes change, and the chip turn orange.","git status is the command you run most. It answers: what did I change, and what have I not saved yet?"] },
+    { num:2, title:"Staging: git add", hasHints:true,
+      goal:"Your change is only in the Working directory. Move it to <b>Staging</b>, the pile of things you are about to save: <span class=\"mono\">git add index.html</span> and then <span class=\"mono\">git status</span> again.",
+      hints:["git add picks which changes go into the next save point.","After git add, the file shows up in the Staging box, in blue.","git status now lists it under \"Changes to be committed\"."] },
+    { num:3, title:"Save the change: git commit", hasHints:true,
+      goal:"Turn what you staged into a save point: <span class=\"mono\">git commit -m \"your message\"</span>",
+      hints:["After -m comes the message, in quotes. Write what changed and why, for the you of next month.","Example: git commit -m \"New homepage heading\"","Run git status afterwards: the working tree should be clean."] },
+    { num:4, title:"The history: git log", hasHints:true,
+      goal:"Look at every save point this project has: <span class=\"mono\">git log --oneline</span>",
+      hints:["git log lists commits newest first: a hash (the id) and the message.","Your commit is on top, and the ones you inherited are underneath it.","Those hashes are how you point at a commit later. You will need one in lesson 7."] },
+    { num:5, title:"Off the laptop: git push", hasHints:true,
+      goal:"Your commit only exists on this machine. Send it to <b>GitHub</b>: <span class=\"mono\">git push</span>",
+      hints:["git push copies your local commits up to the server (box 4).","Before the push, git status says you are \"ahead of origin/main\".","After the push it says \"up to date\", and your work survives a dead laptop."] },
+    { num:6, title:"A teammate got there first: git pull", hasHints:true,
+      goal:"While you were working, a teammate pushed <b>2 commits</b>. Fetch them: <span class=\"mono\">git pull</span><br><br>Then look at the preview. Something is wrong with the page.",
+      hints:["git pull downloads the commits from GitHub into your local repo and your files.","Pull before you start working and before you push. It saves arguments.","Once it lands, compare the preview with what it looked like a second ago."] },
+    { num:7, title:"Undo a bad commit: git revert", hasHints:true,
+      goal:"Your teammate's second commit broke the layout, and it is already on GitHub, so you cannot just delete it. You <b>undo</b> it instead:<br><br>1. <span class=\"mono\">git log --oneline</span> and find the commit that broke it<br>2. <span class=\"mono\">git revert &lt;hash&gt;</span> using that commit's hash<br>3. <span class=\"mono\">git push</span>",
+      hints:["Look for the commit called \"Tweak page width\". Copy its hash, the short code at the start of the line.","git revert does not erase history. It adds a new commit that undoes the old one, which is why it is safe on work that is already pushed.","After the revert the preview should look right again. Then push, so GitHub gets the fix too."] },
+    { num:8, title:"The site is down", hasHints:false,
+      goal:"Real one now, no hints.<br><br>Your team lead asks for a bigger font on the homepage. You open <b>style.css</b>, set the body <span class=\"mono\">font-size</span> to <span class=\"mono\">60px</span>, save, commit and push it.<br><br>Then the phone rings: the live site is unreadable. Get it back to how it was, on GitHub, using what you learned in lesson 7.",
+      hints:[],
+      steps:["style.css changed and committed","The broken commit pushed to GitHub","Bad commit found in git log","git revert run on that commit","The fix pushed: GitHub is back to a working site"] }
+  ];
+
+  function hasStaged(S){ var ht = treeOf(S, head(S)); return Object.keys(S.index).some(function(n){ return (S.index[n] || "") !== (ht[n] || ""); }); }
+  function anyModified(S){ var ht = treeOf(S, head(S)); return Object.keys(S.working).some(function(n){ return (S.working[n] || "") !== (ht[n] || ""); }); }
+
+  // Snapshot where the student stood when the final scenario began.
+  function scenarioSetup(S){
+    if (S.scenarioBase) return;
+    S.scenarioBase = head(S);
+  }
+
+  // Walks back from HEAD to the scenario's starting point.
+  function sinceBase(S){
+    var chain = [], c = head(S);
+    while (c && c !== S.scenarioBase){ chain.push(c); c = S.commits[c].parent; }
+    return c === S.scenarioBase ? chain : [];
+  }
+
+  function liveSubgoals(S){
+    if (!S.scenarioBase) return [false,false,false,false,false];
+    var base = S.scenarioBase, baseTree = treeOf(S, base), chain = sinceBase(S);
+    var broke = chain.filter(function(id){
+      return S.commits[id].msg.indexOf("Revert \"") !== 0 &&
+             (treeOf(S, id)["style.css"] || "") !== (baseTree["style.css"] || "");
+    });
+    var g1 = broke.length > 0;
+    var g2 = g1 && S.origin["main"] !== undefined && isAncestor(S, broke[broke.length - 1], S.origin["main"]);
+    var g3 = S.scenarioLogged === true;
+    var g4 = chain.some(function(id){ return S.commits[id].msg.indexOf("Revert \"") === 0; });
+    var g5 = g4 && S.origin["main"] === S.branches["main"] &&
+             (treeOf(S, head(S))["style.css"] || "") === (baseTree["style.css"] || "");
+    return [g1, g2, g3, g4, g5];
+  }
+  function pollSubgoals(S){
+    var cur = liveSubgoals(S);
+    for (var i = 0; i < 5; i++) if (cur[i]) S.subgoalFlags[i] = true;
+    // The last step is the real finish line, so it must hold right now, not just once upon a time.
+    if (!cur[4]) S.subgoalFlags[4] = false;
+    return S.subgoalFlags;
+  }
+
+  var accepts = [
+    function(S){ return S.ran.edited && anyModified(S) && S.ran.status; },
+    function(S){ return hasStaged(S) && S.ran.add && S.ran.status; },
+    function(S){ return S.ran.commit === true && Object.keys(S.commits).length > HISTORY.length; },
+    function(S){ return S.ran.log && Object.keys(S.commits).length > HISTORY.length; },
+    function(S){ return S.origin[S.branch] === S.branches[S.branch] && S.ran.push; },
+    function(S){ return S.origin[S.branch] === S.branches[S.branch] && S.ran.pull; },
+    function(S){ return S.ran.revert === true && S.origin[S.branch] === S.branches[S.branch]; },
+    function(S){ return pollSubgoals(S).every(function(g){ return g; }); }
+  ];
+
+  // The teammate's two commits. The second one is a plausible typo that wrecks the layout.
+  function teamworkScenario(S){
+    if (S.teamworkPushed) return;
+    if (S.origin["main"] === undefined) return;
+    var cur = S.origin["main"];
+    var base = clone(treeOf(S, cur));
+    var t1 = Object.assign({}, base, {
+      "contact.html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact - Pixel Team</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <h2>Contact</h2>\n  <p>Contact details coming soon...</p>\n</body>\n</html>"
+    });
+    var id1 = rnd();
+    S.commits[id1] = { msg: "Contact page draft", tree: t1, parent: cur };
+    var t2 = Object.assign({}, clone(t1), {
+      "style.css": (t1["style.css"] || "").replace("max-width: 900px;", "max-width: 90px;")
+    });
+    var id2 = rnd();
+    S.commits[id2] = { msg: "Tweak page width", tree: t2, parent: id1 };
+    S.origin["main"] = id2;
+    S.teamworkPushed = true;
+  }
+
+  W.__GYT = { newGame:newGame, normalize:normalize, execGit:execGit, editFile:editFile,
+               PRIMER:PRIMER, LESSONS:LESSONS, HISTORY:HISTORY, accepts:accepts,
+               pollSubgoals:pollSubgoals, liveSubgoals:liveSubgoals, scenarioSetup:scenarioSetup,
+               teamworkScenario:teamworkScenario, resolveRev:resolveRev,
+               treeOf:treeOf, head:head, statusText:statusText };
+/*__ENGINE_END__*/
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var G = window.__GYT;
+  var KEY = "git-gyakorlo-v1";
+  var S = G.normalize(load());
+  var N = G.LESSONS.length;
+  var FINISH = N;
+  var hintIdx = 0;
+  var primerIdx = 0;
+  var primerOpen = false;
+  var history = [];
+
+  function load(){
+    try { var r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch(e){}
+    return null;
+  }
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+  }
+  function encodeCode(){
+    return btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+  }
+  function decodeCode(code){
+    return JSON.parse(decodeURIComponent(escape(atob(String(code).replace(/\s/g,"")))));
+  }
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function openModal(id){ $(id).classList.add("open"); }
+  function closeModals(){ document.querySelectorAll(".modal-back").forEach(function(m){ m.classList.remove("open"); }); }
+
+  var currentLesson = function(){
+    return S.lessonIndex < N ? G.LESSONS[S.lessonIndex] : null;
+  };
+  function isDone(){ return S.lessonIndex < N && G.accepts[S.lessonIndex] && G.accepts[S.lessonIndex](S) === true; }
+
+  /* ---------------- primer ---------------- */
+
+  var ART = {
+    savepoints: function(){
+      var cols = [
+        { head: "In a game", x: 8, rows: [["Before the boss", "2h 14m", 0], ["Boss defeated", "2h 41m", 0], ["Everything on fire", "2h 43m", 1]] },
+        { head: "In your code", x: 332, rows: [["Homepage finished", "Tue 14:02", 0], ["Contact page added", "Tue 16:30", 0], ["Layout completely broken", "Wed 09:15", 1]] }
+      ];
+      var s = '<svg viewBox="0 0 640 236" role="img" aria-label="Three save slots in a game next to three save points in a code project, each with an arrow going back to the last good one">';
+      cols.forEach(function(c){
+        s += '<text x="' + c.x + '" y="16" font-size="13" font-weight="700" fill="#1c2430">' + c.head + '</text>';
+        c.rows.forEach(function(r, i){
+          var y = 30 + i * 52, broken = r[2] === 1;
+          s += '<rect x="' + c.x + '" y="' + y + '" width="268" height="42" rx="8" fill="' + (broken ? "#fef2f2" : "#fff") + '" stroke="' + (broken ? "#fecaca" : "#e3e6ea") + '"/>';
+          s += '<circle cx="' + (c.x + 20) + '" cy="' + (y + 21) + '" r="7" fill="' + (broken ? "#dc2626" : "#f05a28") + '"/>';
+          s += '<text x="' + (c.x + 38) + '" y="' + (y + 19) + '" font-size="12" font-weight="700" fill="#1c2430">' + r[0] + '</text>';
+          s += '<text x="' + (c.x + 38) + '" y="' + (y + 34) + '" font-size="11" fill="#9aa0a6">' + r[1] + '</text>';
+        });
+        // The arrow back from the broken slot to the last one that worked.
+        var ax = c.x + 274;
+        s += '<path d="M ' + ax + ' 155 C ' + (ax + 20) + ' 150, ' + (ax + 20) + ' 100, ' + ax + ' 100" fill="none" stroke="#2e9e5b" stroke-width="2"/>';
+        s += '<path d="M ' + ax + ' 100 l 11 -3 l -4 11 z" fill="#2e9e5b"/>';
+      });
+      s += '<text x="320" y="200" font-size="12" font-weight="700" fill="#2e9e5b" text-anchor="middle">Go back to the last one that worked.</text>';
+      s += '<text x="320" y="222" font-size="12" fill="#6b7280" text-anchor="middle">Same move, same relief. Git is what gives your project the save slots.</text>';
+      s += '<line x1="316" y1="8" x2="316" y2="182" stroke="#e3e6ea" stroke-dasharray="4 4"/>';
+      return s + '</svg>';
+    },
+    glossary: function(){
+      var rows = [
+        ["a save point", "a commit"],
+        ["the note you put on the save", "a commit message"],
+        ["your list of saves", "git log"],
+        ["going back to an old save", "git revert"],
+        ["the folder git is watching", "a repository (“repo”)"],
+        ["the copy that lives online", "GitHub (the “remote”)"],
+        ["sending it up / getting it down", "git push / git pull"]
+      ];
+      var s = '<svg viewBox="0 0 640 246" role="img" aria-label="Everyday words on the left matched to the git word for each on the right">';
+      s += '<text x="248" y="16" font-size="12" font-weight="700" fill="#6b7280" text-anchor="end">What you would call it</text>';
+      s += '<text x="300" y="16" font-size="12" font-weight="700" fill="#f05a28">What git calls it</text>';
+      rows.forEach(function(r, i){
+        var y = 32 + i * 30;
+        s += '<text x="248" y="' + (y + 16) + '" font-size="12.5" fill="#1c2430" text-anchor="end">' + r[0] + '</text>';
+        s += '<line x1="258" y1="' + (y + 12) + '" x2="284" y2="' + (y + 12) + '" stroke="#c9cfd6" stroke-width="1.5"/>';
+        s += '<path d="M 288 ' + (y + 12) + ' l -8 -4 l 0 8 z" fill="#c9cfd6"/>';
+        s += '<text x="300" y="' + (y + 16) + '" font-size="12.5" font-weight="700" font-family="ui-monospace,monospace" fill="#f05a28">' + r[1] + '</text>';
+        if (i < rows.length - 1) s += '<line x1="8" y1="' + (y + 29) + '" x2="632" y2="' + (y + 29) + '" stroke="#f1f3f5"/>';
+      });
+      return s + '</svg>';
+    },
+    folders: function(){
+      var bad = ["index.html","index-final.html","index-final-2.html","index-REAL-final.html","index-use-this-one.html"];
+      var good = [["a41f9c2","Add footer"],["7d02e18","List our work"],["31d8d25","Add hero section"],["2041e41","Add navigation bar"],["10b43d4","Initial commit"]];
+      var s = '<svg viewBox="0 0 640 230" role="img" aria-label="A folder of confusingly named files next to a clean list of commits">';
+      s += '<text x="8" y="18" font-size="13" font-weight="700" fill="#b91c1c">Without git</text>';
+      s += '<text x="330" y="18" font-size="13" font-weight="700" fill="#2e9e5b">With git</text>';
+      bad.forEach(function(n,i){
+        var y = 34 + i * 34;
+        s += '<rect x="8" y="' + y + '" width="290" height="26" rx="6" fill="#fef2f2" stroke="#fecaca"/>';
+        s += '<text x="20" y="' + (y + 18) + '" font-size="12" font-family="ui-monospace,monospace" fill="#7f1d1d">' + n + '</text>';
+      });
+      good.forEach(function(c,i){
+        var y = 34 + i * 34;
+        s += '<rect x="330" y="' + y + '" width="302" height="26" rx="6" fill="#f0fdf4" stroke="#bbf7d0"/>';
+        s += '<circle cx="345" cy="' + (y + 13) + '" r="4" fill="#2e9e5b"/>';
+        s += '<text x="358" y="' + (y + 18) + '" font-size="12" font-family="ui-monospace,monospace" fill="#f05a28">' + c[0] + '</text>';
+        s += '<text x="418" y="' + (y + 18) + '" font-size="12" fill="#1c2430">' + c[1] + '</text>';
+      });
+      s += '<line x1="314" y1="28" x2="314" y2="206" stroke="#e3e6ea" stroke-dasharray="4 4"/>';
+      return s + '</svg>';
+    },
+    timeline: function(){
+      var pts = [["Initial commit",0],["Add navigation",0],["Add hero",0],["List our work",0],["Broke the layout",1],["Back to working",2]];
+      var s = '<svg viewBox="0 0 640 200" role="img" aria-label="A row of commits with one broken commit and an arrow back to the last working one">';
+      s += '<line x1="40" y1="90" x2="600" y2="90" stroke="#e3e6ea" stroke-width="2"/>';
+      pts.forEach(function(p,i){
+        var x = 45 + i * 102;
+        var fill = p[1] === 1 ? "#dc2626" : (p[1] === 2 ? "#2e9e5b" : "#f05a28");
+        s += '<circle cx="' + x + '" cy="90" r="11" fill="' + fill + '"/>';
+        if (p[1] === 1) s += '<text x="' + x + '" y="95" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">!</text>';
+        if (p[1] === 2) s += '<text x="' + x + '" y="95" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">&#10003;</text>';
+        s += '<text x="' + x + '" y="124" font-size="11" fill="#6b7280" text-anchor="middle">' + p[0] + '</text>';
+      });
+      s += '<path d="M 555 72 C 540 34, 400 34, 366 68" fill="none" stroke="#2e9e5b" stroke-width="2" stroke-dasharray="5 4"/>';
+      s += '<path d="M 366 68 l 10 -9 l 1 12 z" fill="#2e9e5b"/>';
+      s += '<text x="460" y="26" font-size="12" font-weight="700" fill="#2e9e5b" text-anchor="middle">git revert</text>';
+      s += '<text x="320" y="170" font-size="12" fill="#6b7280" text-anchor="middle">Every dot is a version you can come back to.</text>';
+      return s + '</svg>';
+    },
+    boxes: function(){
+      var names = ["Working directory","Staging","Local repo","GitHub"];
+      var subs = ["you edit here","what you picked","your save points","the safe copy"];
+      var cmds = ["git add","git commit","git push"];
+      var s = '<svg viewBox="0 0 640 200" role="img" aria-label="Four boxes: working directory, staging, local repo and GitHub, joined by git add, git commit and git push">';
+      names.forEach(function(n,i){
+        var x = 8 + i * 158;
+        s += '<rect x="' + x + '" y="46" width="134" height="72" rx="10" fill="#fff" stroke="' + (i === 3 ? "#f05a28" : "#d3d7dd") + '" stroke-width="' + (i === 3 ? 2 : 1) + '"/>';
+        s += '<text x="' + (x + 67) + '" y="42" font-size="11" fill="#9aa0a6" text-anchor="middle">' + (i + 1) + '</text>';
+        s += '<text x="' + (x + 67) + '" y="80" font-size="12" font-weight="700" fill="#1c2430" text-anchor="middle">' + n + '</text>';
+        s += '<text x="' + (x + 67) + '" y="99" font-size="11" fill="#6b7280" text-anchor="middle">' + subs[i] + '</text>';
+        if (i < 3){
+          var ax = x + 134;
+          s += '<line x1="' + (ax + 4) + '" y1="82" x2="' + (ax + 18) + '" y2="82" stroke="#9aa0a6" stroke-width="2"/>';
+          s += '<path d="M ' + (ax + 22) + ' 82 l -8 -5 l 0 10 z" fill="#9aa0a6"/>';
+          s += '<text x="' + (ax + 12) + '" y="140" font-size="11" font-family="ui-monospace,monospace" fill="#f05a28" text-anchor="middle">' + cmds[i] + '</text>';
+        }
+      });
+      s += '<text x="320" y="178" font-size="12" fill="#6b7280" text-anchor="middle">git pull brings box 4 back down to box 1 when a teammate pushed something.</text>';
+      return s + '</svg>';
+    },
+    commands: function(){
+      var rows = [["git status","what did I change?"],["git add","pick what to save"],["git commit","save it, with a note"],
+                  ["git push","copy it to GitHub"],["git pull","get the team's work"],["git revert","undo a bad commit"]];
+      var s = '<svg viewBox="0 0 640 220" role="img" aria-label="The six git commands this course teaches and what each one does">';
+      rows.forEach(function(r,i){
+        var col = i % 2, row = Math.floor(i / 2);
+        var x = 8 + col * 316, y = 14 + row * 64;
+        s += '<rect x="' + x + '" y="' + y + '" width="300" height="52" rx="10" fill="#fff" stroke="#e3e6ea"/>';
+        s += '<text x="' + (x + 16) + '" y="' + (y + 22) + '" font-size="13" font-weight="700" font-family="ui-monospace,monospace" fill="#f05a28">' + r[0] + '</text>';
+        s += '<text x="' + (x + 16) + '" y="' + (y + 40) + '" font-size="12" fill="#6b7280">' + r[1] + '</text>';
+      });
+      s += '<text x="320" y="212" font-size="12" fill="#6b7280" text-anchor="middle">Six commands. That is most of what a working developer types all day.</text>';
+      return s + '</svg>';
+    }
+  };
+
+  function renderPrimer(){
+    var wrap = $("primer"), grid = $("main-grid");
+    if (!primerOpen){
+      wrap.style.display = "none";
+      grid.style.display = "";
+      return;
+    }
+    wrap.style.display = "";
+    grid.style.display = "none";
+    var P = G.PRIMER[primerIdx];
+    var last = primerIdx === G.PRIMER.length - 1;
+    var dots = "";
+    for (var i = 0; i < G.PRIMER.length; i++){
+      dots += '<span class="pdot' + (i === primerIdx ? " cur" : "") + '" data-slide="' + i + '"></span>';
+    }
+    wrap.innerHTML =
+      '<div class="card primer-card">' +
+        '<div class="primer-kicker">Before we start: why bother with git at all</div>' +
+        '<h2 class="primer-title">' + esc(P.title) + '</h2>' +
+        '<div class="primer-art">' + ART[P.art]() + '</div>' +
+        '<div class="primer-scrollhint">Drag the drawing sideways to see the rest of it.</div>' +
+        '<p class="primer-body">' + P.body + '</p>' +
+        '<div class="primer-nav">' +
+          '<div class="pdots" id="pdots">' + dots + '</div>' +
+          '<button class="btn" id="p-back"' + (primerIdx === 0 ? " disabled" : "") + '>&larr; Back</button>' +
+          '<button class="btn primary" id="p-next">' + (last ? "Let's go →" : "Next →") + '</button>' +
+          (S.primerDone ? '<button class="btn" id="p-close">Close</button>' : "") +
+        '</div>' +
+      '</div>';
+    $("p-back").onclick = function(){ if (primerIdx > 0){ primerIdx--; renderPrimer(); } };
+    $("p-next").onclick = function(){
+      if (!last){ primerIdx++; renderPrimer(); return; }
+      S.primerDone = true;
+      primerOpen = false;
+      save();
+      renderAll();
+    };
+    if ($("p-close")) $("p-close").onclick = function(){ primerOpen = false; renderAll(); };
+    $("pdots").onclick = function(e){
+      var d = e.target.closest(".pdot");
+      if (d){ primerIdx = Number(d.dataset.slide); renderPrimer(); }
+    };
+  }
+
+  /* ---------------- boxes, preview, graph ---------------- */
+
+  function renderHeader(){
+    var d = $("dots"); d.innerHTML = "";
+    for (var i = 0; i < N; i++){
+      var el = document.createElement("span");
+      el.className = "dot" + (S.done[i] ? " done" : "") + (S.lessonIndex === i ? " cur" : "");
+      el.title = "Lesson " + (i+1);
+      d.appendChild(el);
+    }
+  }
+
+  function chip(file, state, clickable){
+    var c = document.createElement("span");
+    c.className = "chip mono";
+    if (state === "mod") c.classList.add("mod");
+    if (state === "staged") c.classList.add("staged");
+    if (clickable) { c.classList.add("clickable"); c.dataset.file = file; }
+    var st = document.createElement("span");
+    st.className = "st " + state;
+    c.appendChild(st);
+    c.appendChild(document.createTextNode(file));
+    return c;
+  }
+
+  function fileState(S, n){
+    var ht = treeOf(S, head(S));
+    var idx = S.index[n] || "", work = S.working[n] || "", hd = ht[n] || "";
+    if (work !== idx) return "mod";
+    if (idx !== hd) return "staged";
+    return "clean";
+  }
+  function treeOf(S, cid){ return G.treeOf(S, cid); }
+  function head(S){ return G.head(S); }
+
+  // Renders the working-directory index.html, with style.css inlined so the
+  // student sees the page their files actually describe. No scripts, ever.
+  function renderPreview(){
+    var frame = $("preview");
+    if (!frame) return;
+    var html = S.working["index.html"];
+    if (html === undefined){
+      frame.srcdoc = "<p style='font:13px sans-serif;color:#9aa0a6;padding:12px'>No index.html in the working directory.</p>";
+      return;
+    }
+    var css = S.working["style.css"] || "";
+    var doc = html.replace(/<link[^>]*href=["']style\.css["'][^>]*>/i, "<style>" + css + "</style>");
+    if (doc === html && css) doc = doc.replace(/<\/head>/i, "<style>" + css + "</style></head>");
+    // Some browsers (observed in Chrome) do not repaint a sandboxed
+    // srcdoc iframe on a second navigation if the attribute is simply
+    // overwritten. Clearing it first forces a fresh navigation every time.
+    frame.removeAttribute("srcdoc");
+    frame.srcdoc = doc;
+  }
+
+  function renderBoxes(){
+    var work = $("box-work"), stage = $("box-stage"), local = $("box-local"), gh = $("box-gh");
+    work.innerHTML = "";
+    Object.keys(S.working).forEach(function(n){
+      work.appendChild(chip(n, fileState(S, n) === "mod" ? "mod" : "clean", true));
+    });
+    stage.innerHTML = "";
+    var ht = treeOf(S, head(S));
+    var staged = Object.keys(S.index).filter(function(n){ return (S.index[n] || "") !== (ht[n] || ""); });
+    if (!staged.length) stage.appendChild(emptyEl("nothing staged yet"));
+    staged.forEach(function(n){ stage.appendChild(chip(n, "staged", false)); });
+
+    local.innerHTML = "";
+    var h = head(S);
+    if (h){
+      var card = document.createElement("div");
+      card.className = "commit-card mono";
+      card.innerHTML = "<span class=\"hash\">" + esc(h) + "</span> " + esc(S.commits[h].msg);
+      local.appendChild(card);
+    } else local.appendChild(emptyEl("no commits"));
+
+    gh.innerHTML = "";
+    var any = false;
+    Object.keys(S.origin).forEach(function(k){
+      any = true;
+      var line = document.createElement("div");
+      line.className = "repoline mono";
+      var pill = "";
+      var rel = relHere(k);
+      if (rel.ahead > 0) pill = " <span class=\"pill\" style=\"background:#fff7ed;color:#b45309;\">local " + rel.ahead + " commit(s) ahead</span>";
+      else if (rel.behind > 0) pill = " <span class=\"pill\" style=\"background:#eff6ff;color:#1d4ed8;\">pull needed: " + rel.behind + " commit(s)</span>";
+      line.innerHTML = "origin/<b>" + esc(k) + "</b> &rarr; " + esc(S.origin[k]) + pill;
+      gh.appendChild(line);
+    });
+    if (!any) gh.appendChild(emptyEl("no push yet"));
+    renderPreview();
+  }
+
+  function relHere(k){
+    var loc = S.branches[k], rem = S.origin[k];
+    if (rem === undefined) return { ahead:0, behind:0 };
+    if (loc === rem) return { ahead:0, behind:0 };
+    if (isAncestorOf(rem, loc)) return { ahead:distAway(loc, rem), behind:0 };
+    if (isAncestorOf(loc, rem)) return { ahead:0, behind:distAway(rem, loc) };
+    return { ahead:0, behind:0 };
+  }
+  function distAway(from, to){ var n=0,c=from; while(c&&c!==to){c=S.commits[c].parent;n++;} return c?n:0; }
+  function isAncestorOf(x, y){ var c=y; while(c){ if(c===x) return true; c=S.commits[c].parent; } return false; }
+
+  function emptyEl(txt){
+    var e = document.createElement("span");
+    e.className = "empty";
+    e.textContent = txt;
+    return e;
+  }
+
+  function renderGraph(){
+    var box = $("graph");
+    box.innerHTML = "";
+    var labels = {};
+    Object.keys(S.branches).forEach(function(k){
+      labels[S.branches[k]] = labels[S.branches[k]] || [];
+      labels[S.branches[k]].push(k);
+    });
+    Object.keys(S.origin).forEach(function(k){
+      var v = S.origin[k];
+      labels[v] = labels[v] || [];
+      labels[v].push("origin/" + k);
+    });
+    var seen = {}, chain = [], c = head(S);
+    while (c && !seen[c]){ seen[c] = true; chain.push(c); c = S.commits[c].parent; }
+    if (!chain.length){ box.appendChild(emptyEl("no commits")); return; }
+    var wrap = document.createElement("div");
+    for (var i = 0; i < chain.length; i++){
+      var cm = chain[i];
+      var row = document.createElement("div");
+      var isHead = i === 0 && S.branch;
+      row.className = "grow" + (isHead ? " head" : "");
+      var nd = document.createElement("span"); nd.className = "nd";
+      row.appendChild(nd);
+      var txt = document.createElement("span");
+      txt.className = "hsh mono"; txt.textContent = cm;
+      row.appendChild(txt);
+      var msg = document.createElement("span"); msg.className = "msg"; msg.textContent = S.commits[cm].msg;
+      row.appendChild(msg);
+      (labels[cm] || []).forEach(function(l){
+        var p = document.createElement("span");
+        p.className = "pill mono" + (l === S.branch ? " head" : "");
+        p.textContent = l;
+        row.appendChild(p);
+      });
+      if (isHead){ var hp = document.createElement("span"); hp.className = "pill head"; hp.textContent = "HEAD"; row.appendChild(hp); }
+      wrap.appendChild(row);
+    }
+    box.appendChild(wrap);
+  }
+
+  /* ---------------- lessons ---------------- */
+
+  function renderLesson(){
+    var t = $("lesson-title"), num = $("lesson-num"), goal = $("lesson-goal"),
+        steps = $("lesson-steps"), state = $("lesson-state"), hint = $("lesson-hint"),
+        err = $("lesson-err"), btns = $("lesson-buttons");
+    if (S.lessonIndex >= FINISH){ renderFinish(t, num, goal, steps, state, hint, err, btns); return; }
+    if (S.lessonIndex === 5) G.teamworkScenario(S);
+    if (S.lessonIndex === 7) G.scenarioSetup(S);
+    var L = currentLesson();
+    t.textContent = L.title;
+    num.textContent = "Lesson " + (S.lessonIndex + 1) + " / " + N;
+    goal.innerHTML = L.goal;
+    steps.innerHTML = "";
+    if (L.steps){
+      var flags = G.pollSubgoals(S);
+      var ul = document.createElement("ul"); ul.className = "steps";
+      L.steps.forEach(function(label, i){
+        var li = document.createElement("li");
+        li.className = flags[i] ? "done" : "";
+        li.innerHTML = "<span class=\"boxx\">" + (flags[i] ? "&#10003;" : "") + "</span>" + esc(label);
+        ul.appendChild(li);
+      });
+      steps.appendChild(ul);
+    }
+    var done = isDone();
+    if (done){ S.done[S.lessonIndex] = true; }
+    state.innerHTML = done
+      ? "<span class=\"ok\">&#10003; Done! You reached the goal.</span>"
+      : "<span class=\"wait\">&#9699; Keep going...</span>";
+    hint.style.display = L.hasHints ? "" : "none";
+    err.classList.remove("open");
+    renderHint();
+    btns.innerHTML = "";
+    var back = document.createElement("button");
+    back.className = "btn"; back.textContent = "← Back";
+    back.disabled = S.lessonIndex === 0;
+    back.onclick = function(){ gotoLesson(S.lessonIndex - 1); };
+    btns.appendChild(back);
+    if (L.hasHints){
+      var tip = document.createElement("button");
+      tip.className = "btn"; tip.textContent = "Hint";
+      tip.onclick = function(){
+        hintIdx = (hintIdx + 1) % L.hints.length;
+        renderHint();
+      };
+      btns.appendChild(tip);
+    }
+    if (done){
+      var np = document.createElement("button");
+      np.className = "btn primary";
+      var lastLesson = S.lessonIndex === N - 1;
+      np.textContent = lastLesson ? "Finish" : "Next lesson →";
+      np.onclick = function(){ gotoLesson(S.lessonIndex + 1); };
+      btns.appendChild(np);
+    }
+  }
+
+  function renderFinish(t, num, goal, steps, state, hint, err, btns){
+    t.textContent = "Nice work!";
+    num.textContent = "Done";
+    goal.innerHTML = "";
+    steps.innerHTML = "";
+    var fin = document.createElement("div");
+    fin.className = "fin";
+    fin.innerHTML = "<b>You got through it, including the part where the site went down.</b> " +
+      "Six commands, and you have used every one of them:<br>" +
+      "<ul>" +
+      "<li><span class=\"mono\">git status</span>: what did I change?</li>" +
+      "<li><span class=\"mono\">git add</span> and <span class=\"mono\">git commit -m \"...\"</span>: make a save point</li>" +
+      "<li><span class=\"mono\">git push</span> and <span class=\"mono\">git pull</span>: swap work with GitHub and your team</li>" +
+      "<li><span class=\"mono\">git revert &lt;hash&gt;</span>: undo a commit that is already pushed</li>" +
+      "</ul>" +
+      "<p>Next: do the same on a <b>real</b> repository, in a real terminal. Make a repo on GitHub, clone it, " +
+      "change one file, and run the loop until it is boring. Boring is the goal.</p>" +
+      "<p>Branches come later, and they build on exactly this. When you are curious: " +
+      "<a href=\"https://learngitbranching.js.org/?NODEMO\" target=\"_blank\" rel=\"noopener\">Learn Git Branching</a>.</p>";
+    goal.appendChild(fin);
+    state.innerHTML = "";
+    hint.style.display = "none";
+    err.classList.remove("open");
+    btns.innerHTML = "";
+    var ag = document.createElement("button");
+    ag.className = "btn"; ag.textContent = "← Back to the last lesson";
+    ag.onclick = function(){ gotoLesson(N - 1); };
+    btns.appendChild(ag);
+    var rst = document.createElement("button");
+    rst.className = "btn primary"; rst.textContent = "↻ Reset";
+    rst.onclick = function(){ doReset(); };
+    btns.appendChild(rst);
+  }
+
+  function gotoLesson(i){
+    if (i < 0) i = 0;
+    if (i > FINISH) i = FINISH;
+    S.lessonIndex = i;
+    hintIdx = 0;
+    save();
+    renderHeader();
+    renderLesson();
+    renderBoxes();
+    renderGraph();
+  }
+
+  function renderHint(){
+    var L = currentLesson();
+    var hint = $("lesson-hint");
+    if (!L || !L.hasHints){
+      hint.style.display = "none";
+      return;
+    }
+    hint.innerHTML = "<b>Hint " + (hintIdx + 1) + "/" + L.hints.length + ":</b> " + L.hints[hintIdx];
+  }
+
+  function updateAccept(){
+    if (S.lessonIndex < N && G.accepts[S.lessonIndex] && G.accepts[S.lessonIndex](S)) S.done[S.lessonIndex] = true;
+    save();
+    renderHeader();
+    renderLesson();
+  }
+
+  /* ---------------- terminal ---------------- */
+
+  function addTerm(cmd, outArr){
+    history.push({ cmd: cmd, out: outArr });
+  }
+  function renderTerm(){
+    var box = $("termout");
+    box.innerHTML = "";
+    history.slice(-400).forEach(function(e){
+      if (e.cmd !== null){
+        var d = document.createElement("div");
+        d.className = "cli";
+        d.textContent = "$ " + e.cmd;
+        box.appendChild(d);
+      }
+      (e.out || []).forEach(function(l){
+        var o = document.createElement("div");
+        o.className = "out";
+        o.textContent = l;
+        box.appendChild(o);
+      });
+    });
+    box.scrollTop = box.scrollHeight;
+  }
+
+  var termIn = $("term-in");
+  termIn.addEventListener("keydown", function(ev){
+    if (ev.key === "Enter"){
+      var v = termIn.value.trim();
+      if (!v) return;
+      termIn.value = "";
+      addTerm(v, null);
+      var res = G.execGit(S, v);
+      if (res.out.length) addTerm(null, res.out);
+      updateAccept();
+      renderBoxes();
+      renderGraph();
+      renderTerm();
+    }
+  });
+  termIn.addEventListener("focus", renderTerm);
+
+  /* ---------------- editor + modals ---------------- */
+
+  function openEditor(file){
+    $("ed-name").textContent = file;
+    $("ed-text").value = S.working[file] || "";
+    $("modal-editor")._file = file;
+    openModal("modal-editor");
+    $("ed-text").focus();
+  }
+  $("ed-save").onclick = function(){
+    var f = $("modal-editor")._file;
+    G.editFile(S, f, $("ed-text").value);
+    updateAccept();
+    renderBoxes();
+    renderGraph();
+    closeModals();
+  };
+  $("ed-cancel").onclick = closeModals;
+  $("modal-editor").addEventListener("click", function(e){ if (e.target === this) closeModals(); });
+
+  $("box-work").addEventListener("click", function(e){
+    var chip = e.target.closest(".chip[data-file]");
+    if (chip) openEditor(chip.dataset.file);
+  });
+
+  $("btn-why").onclick = function(){
+    primerOpen = true;
+    primerIdx = 0;
+    renderAll();
+  };
+
+  $("btn-code").onclick = function(){
+    $("code-text").value = encodeCode();
+    openModal("modal-code");
+  };
+  $("code-copy").onclick = function(){
+    $("code-text").select();
+    try { document.execCommand("copy"); } catch(e){}
+    $("code-text").blur();
+  };
+  $("code-close").onclick = closeModals;
+  $("modal-code").addEventListener("click", function(e){ if (e.target === this) closeModals(); });
+
+  $("btn-paste").onclick = function(){ $("paste-text").value = ""; openModal("modal-paste"); $("paste-text").focus(); };
+  $("paste-load").onclick = function(){
+    try {
+      var nS = G.normalize(decodeCode($("paste-text").value));
+      if (!confirm("Restore this progress? Your current progress will be overwritten.")) return;
+      S = nS;
+      save();
+      hintIdx = 0;
+      primerOpen = !S.primerDone;
+      closeModals();
+      renderAll();
+    } catch(e){
+      alert("The code is invalid. Make sure you copied the entire code.");
+    }
+  };
+  $("paste-close").onclick = closeModals;
+  $("modal-paste").addEventListener("click", function(e){ if (e.target === this) closeModals(); });
+
+  $("btn-reset").onclick = doReset;
+  function doReset(){
+    if (!confirm("Reset all progress and start over?")) return;
+    try { localStorage.removeItem(KEY); } catch(e){}
+    S = G.normalize(null);
+    hintIdx = 0;
+    primerIdx = 0;
+    primerOpen = true;
+    history = [];
+    renderAll();
+  }
+
+  function renderAll(){
+    renderPrimer();
+    renderHeader();
+    renderLesson();
+    renderBoxes();
+    renderGraph();
+    renderTerm();
+  }
+
+  primerOpen = !S.primerDone;
+  renderAll();
+  if (!primerOpen) termIn.focus();
+})();
+</script>
+</body>
+</html>
