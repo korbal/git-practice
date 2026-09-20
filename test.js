@@ -188,7 +188,7 @@ K("ended around commit 14", nCommits() === G.HISTORY.length + 6, String(nCommits
   K("non-git command -> shell error", e("cowsay hi").includes("command not found"));
   K("a known non-git command gets an answer instead", e("sudo rm -rf /").includes("browser tab"));
   K("rm says nothing happened", e("rm index.html").includes("nothing happened"));
-  K("git blame blames Bence", e("git blame style.css").includes("Bence"));
+  K("git blame blames Józsi", e("git blame style.css").includes("Józsi"));
   K("git blame still explains the real command", e("git blame style.css").includes("who last touched"));
   K("push --force is ignored, with a note", e("git push --force").includes("--force ignored"));
   K("unknown git command", e("git all").includes("not a git command"));

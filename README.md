@@ -19,12 +19,12 @@ A primer, then seven drills, then one unguided scenario.
 3. Make the save point: `git commit`
 4. Your save slots: `git log`
 5. Cloud save: `git push`
-6. Bence saved over you: `git pull`
+6. Józsi saved over you: `git pull`
 7. Load the last good save: `git revert`
 
-Lesson 6 is where the drama starts. Bence is the teammate, and his second commit contains a plausible typo (`max-width: 900px` becomes `90px`) that visibly wrecks the layout in the preview pane the moment the student pulls it. Lesson 7 has them find it in the log and revert it.
+Lesson 6 is where the drama starts. Józsi is the teammate, and his second commit contains a plausible typo (`max-width: 900px` becomes `90px`) that visibly wrecks the layout in the preview pane the moment the student pulls it. Lesson 7 has them find it in the log and revert it.
 
-**Lesson 8, "The site is down".** No hints, and the broken commit is the student's own rather than Bence's. The team lead asks for a bigger font, the student pushes it, the phone rings, and they have to roll it back themselves. Five steps tick green as they get there, and the last one un-ticks if they break it again.
+**Lesson 8, "The site is down".** No hints, and the broken commit is the student's own rather than Józsi's. The team lead asks for a bigger font, the student pushes it, the phone rings, and they have to roll it back themselves. Five steps tick green as they get there, and the last one un-ticks if they break it again.
 
 ## Scope decisions, on purpose
 
@@ -36,11 +36,11 @@ Read this before adding anything.
 
 **Six commands total.** `status`, `add`, `commit`, `log`, `push`, `pull`, `revert`. Every command added is one more thing a beginner has to hold in their head.
 
-**English.** The repo name is Hungarian, the app is not. Bence is the one Hungarian word in it, on purpose.
+**English.** The repo name is Hungarian, the app is not. Józsi is the one Hungarian word in it, on purpose.
 
-**One metaphor, carried all the way through.** A commit is a save point, `git log` is the save slots, `git revert` loads an older save, `git push` is the cloud save, `git pull` downloads the other player's saves, and Bence saving over you is what makes lesson 6 land. The primer opens on it and every lesson after keeps the same words. New copy uses that vocabulary or it weakens the parts that already do.
+**One metaphor, carried all the way through.** A commit is a save point, `git log` is the save slots, `git revert` loads an older save, `git push` is the cloud save, `git pull` downloads the other player's saves, and Józsi saving over you is what makes lesson 6 land. The primer opens on it and every lesson after keeps the same words. New copy uses that vocabulary or it weakens the parts that already do.
 
-**Bence stays out of the engine.** He is named in lesson text and in the `git blame` reply only. Command output keeps matching real git, because that is what students meet next week.
+**Józsi stays out of the engine.** He is named in lesson text and in the `git blame` reply only. Command output keeps matching real git, because that is what students meet next week.
 
 ## Architecture
 

@@ -790,8 +790,8 @@
       }
 
       case "blame":
-        out.push("It was Bence.");
-        out.push("It is usually Bence. Real git blame shows who last touched each line of a file, which is how you find out for certain.");
+        out.push("It was Józsi.");
+        out.push("It is usually Józsi. Real git blame shows who last touched each line of a file, which is how you find out for certain.");
         break;
 
       default:
@@ -840,14 +840,14 @@
     { num:5, title:"Cloud save: git push", hasHints:true,
       goal:"Your save points exist on this laptop only, and laptops die. Send them up to <b>GitHub</b>: <span class=\"mono\">git push</span>",
       hints:["git push uploads your local save points to the server (box 4).","Before the push, git status says you are \"ahead of origin/main\": the cloud copy is behind you.","After the push it says \"up to date\", and a dead laptop costs you nothing."] },
-    { num:6, title:"Bence saved over you: git pull", hasHints:true,
-      goal:"You are not working on this alone. While you were busy, <b>Bence</b> pushed <b>2 commits</b> of his own. Download them: <span class=\"mono\">git pull</span><br><br>Then look at the preview. Bence has done something.",
+    { num:6, title:"Józsi saved over you: git pull", hasHints:true,
+      goal:"You are not working on this alone. While you were busy, <b>Józsi</b> pushed <b>2 commits</b> of his own. Download them: <span class=\"mono\">git pull</span><br><br>Then look at the preview. Józsi has done something.",
       hints:["git pull downloads the other person's save points into your local repo and your files.","Pull before you start working and before you push. It saves arguments.","Once it lands, compare the preview with what it looked like ten seconds ago."] },
     { num:7, title:"Load the last good save: git revert", hasHints:true,
-      goal:"Bence's second commit broke the layout, and it is already on GitHub, so you cannot quietly delete it. You <b>undo</b> it instead:<br><br>1. <span class=\"mono\">git log --oneline</span> and find the commit that broke it<br>2. <span class=\"mono\">git revert &lt;hash&gt;</span> using that commit's hash<br>3. <span class=\"mono\">git push</span>",
-      hints:["Look for the one called \"Tweak page width\". Bence's commit messages are all like that. Copy its hash, the short code at the start of the line.","git revert does not erase history. It adds a new save point that undoes the old one, which is why it is safe on work other people already have.","After the revert the preview should look right again. Then push, so the cloud save gets the fix too."] },
+      goal:"Józsi's second commit broke the layout, and it is already on GitHub, so you cannot quietly delete it. You <b>undo</b> it instead:<br><br>1. <span class=\"mono\">git log --oneline</span> and find the commit that broke it<br>2. <span class=\"mono\">git revert &lt;hash&gt;</span> using that commit's hash<br>3. <span class=\"mono\">git push</span>",
+      hints:["Look for the one called \"Tweak page width\". Józsi's commit messages are all like that. Copy its hash, the short code at the start of the line.","git revert does not erase history. It adds a new save point that undoes the old one, which is why it is safe on work other people already have.","After the revert the preview should look right again. Then push, so the cloud save gets the fix too."] },
     { num:8, title:"The site is down", hasHints:false,
-      goal:"Real one now, no hints.<br><br>Your team lead asks for a bigger font on the homepage. You open <b>style.css</b>, set the body <span class=\"mono\">font-size</span> to <span class=\"mono\">60px</span>, save, commit and push it.<br><br>Then the phone rings: the live site is unreadable. This one is yours, not Bence's. Get it back to how it was, on GitHub, using what you did in lesson 7.",
+      goal:"Real one now, no hints.<br><br>Your team lead asks for a bigger font on the homepage. You open <b>style.css</b>, set the body <span class=\"mono\">font-size</span> to <span class=\"mono\">60px</span>, save, commit and push it.<br><br>Then the phone rings: the live site is unreadable. This one is yours, not Józsi's. Get it back to how it was, on GitHub, using what you did in lesson 7.",
       hints:[],
       steps:["style.css changed and committed","The broken commit pushed to GitHub","Bad commit found in git log","git revert run on that commit","The fix pushed: GitHub is back to a working site"] }
   ];
