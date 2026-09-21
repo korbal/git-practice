@@ -40,6 +40,25 @@ K("primer opens with the plain-language analogy, before any git word",
 K("primer defines the vocabulary before the four boxes",
   G.PRIMER.findIndex(s => s.art === "glossary") < G.PRIMER.findIndex(s => s.art === "boxes"));
 K("primer ends on the career hook", G.PRIMER[G.PRIMER.length - 1].art === "commands");
+K("primer introduces working together before lesson 6 does",
+  G.PRIMER.findIndex(s => s.art === "coop") > 0 &&
+  G.PRIMER.findIndex(s => s.art === "coop") < G.PRIMER.findIndex(s => s.art === "glossary"));
+K("the co-op slide names Jozsi, so lesson 6 is a callback and not an ambush",
+  /J\u00f3zsi/.test(G.PRIMER.find(s => s.art === "coop").body));
+K("the co-op slide stays jargon-free",
+  !/commit|staging|repository|git push|git pull/i.test(G.PRIMER.find(s => s.art === "coop").body));
+K("git and GitHub are told apart on their own slide, before the four boxes",
+  G.PRIMER.findIndex(s => s.art === "gitvsgithub") < G.PRIMER.findIndex(s => s.art === "boxes"));
+K("the git vs GitHub slide promises the rest of GitHub comes later",
+  /comes after this|comes later/i.test(G.PRIMER.find(s => s.art === "gitvsgithub").body));
+
+// Lesson 8 keeps the phone call out of the brief so the preview breaks the news.
+K("L8 has a second beat", typeof G.LESSONS[7].goal2 === "string" && G.LESSONS[7].goal2.length > 40);
+K("L8 opening brief does not spoil the failure",
+  !/phone|down|broke|unreadable|revert/i.test(G.LESSONS[7].goal), G.LESSONS[7].goal);
+K("L8 title does not spoil it either", !/down|broke/i.test(G.LESSONS[7].title), G.LESSONS[7].title);
+K("L8 second beat is where it goes wrong", /phone|unreadable/i.test(G.LESSONS[7].goal2));
+K("L8 has six steps", G.LESSONS[7].steps.length === 6);
 K("seeded history is " + G.HISTORY.length + " commits", nCommits() === G.HISTORY.length);
 K("seeded history already on GitHub", S.origin.main === S.branches.main);
 {
@@ -143,7 +162,10 @@ K("scenario base recorded", S.scenarioBase === S.branches.main);
 K("scenario starts with no steps done", G.liveSubgoals(S).every(g => !g));
 K("L8 not accepted at the start", !acc(7));
 
-G.editFile(S, "style.css", S.working["style.css"].replace("font-family: sans-serif;", "font-family: sans-serif;\n  font-size: 60px;"));
+const withFont = (v) => G.treeOf(S, S.scenarioBase)["style.css"]
+  .replace("font-family: sans-serif;", "font-family: sans-serif;\n  font-size: " + v + ";");
+
+G.editFile(S, "style.css", withFont("6em"));
 run("git add .");
 run('git commit -m "Bigger homepage font"');
 K("scenario step 1: change committed", G.liveSubgoals(S)[0]);
@@ -156,15 +178,42 @@ K("scenario step 3: culprit looked up", G.liveSubgoals(S)[2]);
 const myBad = hashOf("Bigger homepage font");
 run("git revert " + myBad);
 K("scenario step 4: reverted", G.liveSubgoals(S)[3]);
-K("scenario step 5 not yet (fix unpushed)", !G.liveSubgoals(S)[4]);
+K("scenario step 5 not yet (revert unpushed)", !G.liveSubgoals(S)[4]);
 K("L8 still not accepted", !acc(7));
 run("git push");
-K("scenario step 5: fix is on GitHub", G.liveSubgoals(S)[4]);
-K("L8 accept", acc(7));
+K("scenario step 5: the revert is on GitHub", G.liveSubgoals(S)[4]);
 K("style.css is back to the working version", S.working["style.css"] === G.treeOf(S, S.scenarioBase)["style.css"]);
+K("scenario step 6 not yet: the lead's request is still undone", !G.liveSubgoals(S)[5]);
+K("L8 not accepted on the revert alone", !acc(7));
+
+// The revert stops the bleeding. The lesson is only finished once the job is done properly.
+G.editFile(S, "style.css", withFont("1.2em"));
+run("git add .");
+run('git commit -m "Bigger homepage font, sensibly"');
+K("scenario step 6 not yet (proper fix unpushed)", !G.liveSubgoals(S)[5]);
+run("git push");
+K("scenario step 6: the proper fix is on GitHub", G.liveSubgoals(S)[5]);
+K("earlier steps stay green after the proper fix", G.liveSubgoals(S).every(Boolean));
+K("L8 accept", acc(7));
+K("style.css ends with the sensible font, not the broken one",
+  S.working["style.css"].includes("1.2em") && !S.working["style.css"].includes("6em"));
 K("final status clean and up to date",
   run("git status").includes("working tree clean") && run("git status").includes("up to date"), run("git status"));
-K("ended around commit 14", nCommits() === G.HISTORY.length + 6, String(nCommits()));
+K("ended around commit 15", nCommits() === G.HISTORY.length + 7, String(nCommits()));
+
+// Fixing it properly before pushing the bare revert must not dead-end the lesson.
+{
+  const P = G.newGame();
+  const pRun = (l) => G.execGit(P, l).out.join("\n");
+  G.scenarioSetup(P);
+  const pBase = G.treeOf(P, P.scenarioBase)["style.css"];
+  G.editFile(P, "style.css", pBase + "\n/* 6em */");
+  pRun("git add ."); pRun('git commit -m "Oops"'); pRun("git push"); pRun("git log --oneline");
+  pRun("git revert " + pRun("git log --oneline").split("\n")[0].split(" ")[0]);
+  G.editFile(P, "style.css", pBase + "\n/* sensible */");
+  pRun("git add ."); pRun('git commit -m "Properly this time"'); pRun("git push");
+  K("revert then fix, pushed once, still completes", G.pollSubgoals(P).every(Boolean));
+}
 
 // ---------- the last step must hold now, not just once
 {
@@ -175,10 +224,14 @@ K("ended around commit 14", nCommits() === G.HISTORY.length + 6, String(nCommits
   rRun("git add ."); rRun('git commit -m "Oops"'); rRun("git push"); rRun("git log");
   const bad = rRun("git log --oneline").split("\n")[0].split(" ")[0];
   rRun("git revert " + bad); rRun("git push");
+  G.editFile(R, "style.css", R.working["style.css"] + "\n/* sensible */");
+  rRun("git add ."); rRun('git commit -m "Properly this time"'); rRun("git push");
   K("scenario complete", G.pollSubgoals(R).every(Boolean));
-  G.editFile(R, "style.css", R.working["style.css"] + "\n/* broke it again */");
+  // Re-applying the exact value that broke it must take the last step back off.
+  G.editFile(R, "style.css", G.treeOf(R, R.scenarioBase)["style.css"] + "\n/* oops */");
   rRun("git add ."); rRun('git commit -m "Broke it again"'); rRun("git push");
-  K("breaking it again un-ticks the final step", !G.pollSubgoals(R)[4]);
+  K("breaking it again un-ticks the final step", !G.pollSubgoals(R)[5]);
+  K("the earlier steps stay ticked", G.pollSubgoals(R).slice(0, 5).every(Boolean));
 }
 
 // ---------- error paths
@@ -203,7 +256,7 @@ K("ended around commit 14", nCommits() === G.HISTORY.length + 6, String(nCommits
   const D = G.newGame();
   const d = (l) => G.execGit(D, l).out.join("\n");
   const lines = D.working["style.css"].split("\n");
-  lines.splice(2, 0, "  font-size: 60px;");
+  lines.splice(2, 0, "  font-size: 6em;");
   G.editFile(D, "style.css", lines.join("\n"));
   d("git add .");
   const outp = d('git commit -m "One line"');
@@ -222,7 +275,7 @@ K("ended around commit 14", nCommits() === G.HISTORY.length + 6, String(nCommits
   K("normalize clamps a stale lessonIndex", n.lessonIndex <= 8);
   K("normalize adds primerDone", n.primerDone === false);
   K("normalize adds ran.revert", n.ran.revert === false);
-  K("normalize pads subgoalFlags to 5", n.subgoalFlags.length === 5);
+  K("normalize pads subgoalFlags to 6", n.subgoalFlags.length === 6);
   K("normalize rebuilds a junk state", G.normalize(null).branches.main !== undefined);
 }
 

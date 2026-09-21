@@ -37,6 +37,8 @@
  *   node shot.js out.png file:///path/to/index.html 800 600
  *   node shot.js out.png "" 1200 900 click-through.js
  *
+ * Set CHROME_PATH to use a Chrome/Chromium that is not in the puppeteer cache.
+ *
  * Exit code is non-zero on failure; stderr has details.
  */
 
@@ -45,6 +47,8 @@ const path = require("path");
 const os = require("os");
 
 function findChrome() {
+  // Escape hatch for machines that have Chrome somewhere else (CI images, containers).
+  if (process.env.CHROME_PATH && fs.existsSync(process.env.CHROME_PATH)) return process.env.CHROME_PATH;
   const cacheRoot = path.join(os.homedir(), ".cache", "puppeteer", "chrome");
   if (!fs.existsSync(cacheRoot)) return null;
   const versions = fs.readdirSync(cacheRoot).sort(); // lexical ~= version sort here

@@ -57,7 +57,7 @@ const clearPrimer = (d) => {
 
 K("boot lands on the primer, not a lesson", doc.getElementById("primer").style.display !== "none");
 K("boot hides the lesson grid", doc.getElementById("main-grid").style.display === "none");
-K("primer has more than the four original slides", SLIDES >= 6, String(SLIDES));
+K("primer covers the concepts, the team and the two tools", SLIDES === 8, String(SLIDES));
 K("primer dot per slide", doc.querySelectorAll("#pdots .pdot").length === SLIDES);
 K("primer Back is disabled on slide 1", doc.getElementById("p-back").disabled === true);
 
@@ -80,6 +80,10 @@ K("a glossary slide maps everyday words to git words",
 K("the vocabulary is introduced before the four boxes",
   titles.findIndex(t => t.includes("words")) < titles.findIndex(t => t.includes("two places")), titles.join(" / "));
 K("the pain slide is still there", titles.some(t => t.includes("break it")));
+K("a slide introduces working with someone else", titles.some(t => t.includes("two of you")));
+K("a slide tells git and GitHub apart", titles.some(t => /git is yours/i.test(t)));
+K("working together is raised before the vocabulary",
+  titles.findIndex(t => t.includes("two of you")) < titles.findIndex(t => t.includes("words you are about to meet")));
 K("the career hook is last", titles[titles.length - 1].includes("the job"));
 K("last slide says let's go", doc.getElementById("p-next").textContent.includes("Let's go"));
 doc.getElementById("p-next").click();
@@ -171,29 +175,55 @@ K("L7 completed", state().includes("Done"));
 clickNext();
 
 // ---------- L8 the scenario
-K("L8 is the scenario", doc.getElementById("lesson-title").textContent === "The site is down");
+K("L8 is the scenario", doc.getElementById("lesson-title").textContent === "Your turn, no hints");
 K("L8 has no hint button", !byText("#lesson-buttons", "Hint"));
-K("L8 renders 5 steps", steps().length === 5);
+K("L8 renders 6 steps", steps().length === 6);
 K("L8 no step is done yet", steps().every(li => !li.classList.contains("done")));
-edit("style.css", readFile("style.css").replace("font-family: sans-serif;", "font-family: sans-serif;\n  font-size: 60px;"));
-K("L8 preview shows the damage", preview().includes("font-size: 60px"));
+// The brief asks for a change. It does not say the change is about to break the site.
+const goalText = () => doc.getElementById("lesson-goal").textContent;
+K("L8 opens on the request alone", /bigger/i.test(goalText()) && !/phone/i.test(goalText()), goalText());
+K("L8 hides the second beat until the break is public", !doc.querySelector("#lesson-goal .turn"));
+// Only ever touches the body rule. A bare /font-size/ would eat .hero h1's 32px,
+// which is the one thing that must survive for the break to look the way it does.
+const sane = (v) => readFile("style.css")
+  .replace(/font-family: sans-serif;\n  font-size: [^;]+;/, "font-family: sans-serif;")
+  .replace("font-family: sans-serif;", "font-family: sans-serif;\n  font-size: " + v + ";");
+
+edit("style.css", sane("6em"));
+K("L8 preview shows the damage", preview().includes("font-size: 6em"));
+K("L8 break leaves the heading rule alone, so body text ends up larger than the heading",
+  preview().includes("font-size: 32px"));
 type("git add .");
 type('git commit -m "Bigger homepage font"');
 K("L8 step 1 done", steps()[0].classList.contains("done"));
+K("L8 still no phone call before the push", !doc.querySelector("#lesson-goal .turn"));
 type("git push");
 K("L8 step 2 done", steps()[1].classList.contains("done"));
+K("L8 the phone rings once the break is on GitHub", !!doc.querySelector("#lesson-goal .turn"));
+K("L8 second beat names the real task", /1\.2em/.test(goalText()));
 K("L8 step 3 not yet", !steps()[2].classList.contains("done"));
 type("git log --oneline");
 K("L8 step 3 done", steps()[2].classList.contains("done"));
 const myBad = hashFor("Bigger homepage font");
 type("git revert " + myBad);
 K("L8 step 4 done", steps()[3].classList.contains("done"));
-K("L8 step 5 not yet (unpushed)", !steps()[4].classList.contains("done"));
+K("L8 step 5 not yet (revert unpushed)", !steps()[4].classList.contains("done"));
 K("L8 not completed yet", !state().includes("Done"));
 type("git push");
 K("L8 step 5 done", steps()[4].classList.contains("done"));
+K("L8 preview back to normal", !preview().includes("font-size: 6em"));
+K("L8 step 6 not yet: the revert alone does not finish it", !steps()[5].classList.contains("done"));
+K("L8 not completed on the revert alone", !state().includes("Done"));
+
+// Load the last good save, then play the section again properly.
+edit("style.css", sane("1.2em"));
+type("git add .");
+type('git commit -m "Bigger homepage font, sensibly"');
+K("L8 step 6 not yet (proper fix unpushed)", !steps()[5].classList.contains("done"));
+type("git push");
+K("L8 step 6 done", steps()[5].classList.contains("done"));
 K("L8 all steps green", steps().every(li => li.classList.contains("done")));
-K("L8 preview back to normal", !preview().includes("font-size: 60px"));
+K("L8 preview ends on the sensible font", preview().includes("font-size: 1.2em"));
 K("L8 completed", state().includes("Done"));
 const finBtn = byText("#lesson-buttons", "Finish");
 K("L8 offers Finish, not Next", !!finBtn && !byText("#lesson-buttons", "Next lesson"));
@@ -202,8 +232,16 @@ finBtn.click();
 // ---------- finish
 K("finish screen", doc.getElementById("lesson-title").textContent === "Nice work!");
 K("finish recaps revert", doc.querySelector(".fin").textContent.includes("git revert"));
-K("finish says branches come later", doc.querySelector(".fin").textContent.includes("Branches come later"));
-K("finish: LGB link", doc.querySelector(".fin a").href.includes("learngitbranching"));
+const finText = doc.querySelector(".fin").textContent;
+// Nothing here sends them at a tool, a website or a command the course never taught.
+K("finish does not send them off to branching", !/branch/i.test(finText));
+K("finish does not ask them to set up a real repo", !/clone|repository|sign up|account/i.test(finText));
+K("finish has no outbound link", !doc.querySelector(".fin a"));
+K("finish hands them the daily loop in order",
+  [...doc.querySelectorAll(".fin ul.loop li .mono")].map(e => e.textContent).join("|") ===
+  'git pull|edit|git status|git add|git commit -m "..."|git push');
+K("finish still promises the rest of GitHub later", /GitHub/.test(finText) && /come next/i.test(finText));
+K("finish keeps the point of the whole thing", /Boring is the goal/.test(finText));
 K("finish: all 8 dots green", doc.querySelectorAll("#dots .dot.done").length === 8);
 
 // ---------- reopening the primer
