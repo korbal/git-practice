@@ -80,6 +80,11 @@
   .ckline { display:flex; gap:6px; flex-direction:column; font-size:14px; }
   .fin { font-size:14px; line-height:1.6; }
   .fin ul { margin:8px 0; padding-left:20px; }
+  .fin ul.loop { list-style:none; padding:10px 12px; margin:8px 0 12px; background:#f6f8fa; border-radius:10px; display:flex; flex-direction:column; gap:5px; }
+  .fin ul.loop li { display:flex; gap:10px; align-items:baseline; font-size:13px; }
+  .fin ul.loop li .mono { color:#f05a28; font-weight:700; flex:none; min-width:150px; }
+  .fin ul.loop li em { font-style:normal; color:#6b7280; }
+  .turn { margin-top:10px; padding-top:10px; border-top:1px dashed #d3d7dd; }
   .modal-back { position:fixed; inset:0; background:rgba(15,18,24,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:16px; }
   .modal-back.open { display:flex; }
   .modal { background:#fff; border-radius:12px; padding:18px; width:min(680px,94vw); max-height:90vh; overflow:auto; }
@@ -275,7 +280,7 @@
       working: {},
       origin: {},
       done: [false,false,false,false,false,false,false,false],
-      subgoalFlags: [false,false,false,false,false],
+      subgoalFlags: [false,false,false,false,false,false],
       ran: { edited:false, status:false, add:false, commit:false, log:false, push:false, pull:false,
              revert:false, branch:false, switch:false, merge:false },
       lessonIndex: 0,
@@ -306,8 +311,8 @@
     for (var i = 0; i < n; i++) d.push(false);
     (S.done || []).forEach(function(v,i){ if (i < n && v) d[i] = true; });
     S.done = d;
-    S.subgoalFlags = (S.subgoalFlags || []).slice(0, 5);
-    while (S.subgoalFlags.length < 5) S.subgoalFlags.push(false);
+    S.subgoalFlags = (S.subgoalFlags || []).slice(0, 6);
+    while (S.subgoalFlags.length < 6) S.subgoalFlags.push(false);
     S.ran = Object.assign({ edited:false, status:false, add:false, commit:false, log:false, push:false,
                             pull:false, revert:false, branch:false, switch:false, merge:false }, S.ran || {});
     if (typeof S.lessonIndex !== "number" || S.lessonIndex < 0 || S.lessonIndex > n) S.lessonIndex = 0;
@@ -807,11 +812,17 @@
     { title: "Think of it as a save point",
       body: "You are deep into a hard game. Before the boss, you <b>save</b>. The boss kills you. You <b>load</b> the save and try again. That is how anyone gets through something hard.<br><br>Writing code is the same job: you try things, and a lot of them break. <b>Git is the save system for your project.</b> That is the entire idea. Everything after this is vocabulary.",
       art: "savepoints" },
+    { title: "Now there are two of you",
+      body: "Same game, but co-op. You and <b>Józsi</b> are building one website, on two laptops, on the same afternoon. There is one shared save file and you both write to it.<br><br>That is a second way to lose work, and it has nothing to do with breaking anything. He saves. You save. One of you lands on top of the other, and that work is gone.<br><br>The rule that prevents it is small: <b>download his saves before you upload yours.</b> Most of what working on a team means is that one habit. You will do it for real in lesson 6.",
+      art: "coop" },
     { title: "You are going to break it",
       body: "Not maybe. Everyone does, including people who have done this for twenty years. The only question is how long it takes you to get back to a version that worked.<br><br>Without a save system your options are Ctrl+Z until you close the editor, or a folder full of files named <span class=\"mono\">final</span>, <span class=\"mono\">final-2</span> and <span class=\"mono\">REAL-final</span> that nobody can tell apart a week later. You have probably already done the second one.",
       art: "folders" },
+    { title: "git is yours, GitHub is the shared one",
+      body: "Two names one letter apart, and everybody mixes them up at first.<br><br><b>git</b> is a program on your laptop. It keeps your save points. It needs no internet and no account, and it is the thing you are about to learn.<br><br><b>GitHub</b> is a website. It holds the shared copy, so Józsi can reach your saves and you can reach his. It is what makes the co-op part possible.<br><br>You will use GitHub here, but only through two commands, and you never have to open the website. An account, making your own repository, and the rest of what GitHub does: that comes after this course. For now it is just the box your saves get sent to.",
+      art: "gitvsgithub" },
     { title: "The words you are about to meet",
-      body: "Git has its own names for the save-system ideas you already understand. None of them are complicated, they are just unfamiliar. You do not have to memorise this slide, you will use all of it in the next twenty minutes.<br><br>One thing that trips up everybody: <b>git</b> is the tool on your laptop, so it holds your local saves. <b>GitHub</b> is a website that keeps a copy, so it is the cloud save. Two different things with annoyingly similar names.",
+      body: "Git has its own names for the save-system ideas you already understand. None of them are complicated, they are just unfamiliar.<br><br>You do not have to memorise this slide. You will use every line of it in the next twenty minutes, and the words stick once you have typed them a few times.",
       art: "glossary" },
     { title: "Every commit is a save point",
       body: "A commit is you telling git: this version works, remember it. Git keeps all of them, each with a message saying what changed and why.<br><br>When something breaks, you pick a save point and go back to it. That is the promise, and you will do exactly that in lesson 7 with a broken page in front of you.",
@@ -820,7 +831,7 @@
       body: "A change travels through four boxes on its way to safety. You edit in the <b>working directory</b>. <span class=\"mono\">git add</span> moves the change to <b>staging</b>, the pile of things you are about to save. <span class=\"mono\">git commit</span> turns that pile into a save point in your <b>local repo</b>. <span class=\"mono\">git push</span> uploads it to <b>GitHub</b>, which is the cloud save.<br><br>Why bother with four? Because the last one is the one that survives. Laptop dies, coffee lands on the keyboard, your work is still on GitHub. These four boxes sit on the left of every lesson from here on.",
       art: "boxes" },
     { title: "This is the job",
-      body: "Every development team you will ever join runs on git. Two people, one project, same afternoon, and neither of them saves over the other. Co-op, with a save system underneath it.<br><br>It is also the portfolio people open. A GitHub profile shows what you build and how you work, which is more than a CV can say.<br><br>The good news is how little you need. Six commands cover most working days, and you are about to use every one of them.",
+      body: "Every development team you will ever join runs on git. Not most of them. All of them.<br><br>It is also the portfolio people open. A GitHub profile shows what you build and how you work over time, which is more than a CV can say.<br><br>The good news is how little you need. Six commands cover most working days, and you are about to use every one of them.",
       art: "commands" }
   ];
 
@@ -841,15 +852,16 @@
       goal:"Your save points exist on this laptop only, and laptops die. Send them up to <b>GitHub</b>: <span class=\"mono\">git push</span>",
       hints:["git push uploads your local save points to the server (box 4).","Before the push, git status says you are \"ahead of origin/main\": the cloud copy is behind you.","After the push it says \"up to date\", and a dead laptop costs you nothing."] },
     { num:6, title:"Józsi saved over you: git pull", hasHints:true,
-      goal:"You are not working on this alone. While you were busy, <b>Józsi</b> pushed <b>2 commits</b> of his own. Download them: <span class=\"mono\">git pull</span><br><br>Then look at the preview. Józsi has done something.",
+      goal:"The co-op problem from the primer, for real. While you were busy, <b>Józsi</b> pushed <b>2 commits</b> of his own. Download them before you touch anything: <span class=\"mono\">git pull</span><br><br>Then look at the preview. Józsi has done something.",
       hints:["git pull downloads the other person's save points into your local repo and your files.","Pull before you start working and before you push. It saves arguments.","Once it lands, compare the preview with what it looked like ten seconds ago."] },
     { num:7, title:"Load the last good save: git revert", hasHints:true,
       goal:"Józsi's second commit broke the layout, and it is already on GitHub, so you cannot quietly delete it. You <b>undo</b> it instead:<br><br>1. <span class=\"mono\">git log --oneline</span> and find the commit that broke it<br>2. <span class=\"mono\">git revert &lt;hash&gt;</span> using that commit's hash<br>3. <span class=\"mono\">git push</span>",
       hints:["Look for the one called \"Tweak page width\". Józsi's commit messages are all like that. Copy its hash, the short code at the start of the line.","git revert does not erase history. It adds a new save point that undoes the old one, which is why it is safe on work other people already have.","After the revert the preview should look right again. Then push, so the cloud save gets the fix too."] },
-    { num:8, title:"The site is down", hasHints:false,
-      goal:"Real one now, no hints.<br><br>Your team lead asks for a bigger font on the homepage. You open <b>style.css</b>, set the body <span class=\"mono\">font-size</span> to <span class=\"mono\">60px</span>, save, commit and push it.<br><br>Then the phone rings: the live site is unreadable. This one is yours, not Józsi's. Get it back to how it was, on GitHub, using what you did in lesson 7.",
+    { num:8, title:"Your turn, no hints", hasHints:false,
+      goal:"Real one now, no hints.<br><br>Your team lead wants the body text on the homepage bigger. Open <b>style.css</b>, add <span class=\"mono\">font-size: 6em;</span> to the <span class=\"mono\">body</span> rule, then save, commit and push it like any other change.",
+      goal2:"<b>Your phone rings. The site is down.</b> The live page is unreadable, and this time the bad commit is yours, not Józsi's. It is already on GitHub, so you cannot quietly delete it.<br><br>First get GitHub back to a working site, the way you did in lesson 7. Then finish the job the lead actually asked for: a sensible bigger font, <span class=\"mono\">font-size: 1.2em;</span>, committed and pushed.",
       hints:[],
-      steps:["style.css changed and committed","The broken commit pushed to GitHub","Bad commit found in git log","git revert run on that commit","The fix pushed: GitHub is back to a working site"] }
+      steps:["style.css changed and committed","The broken commit pushed to GitHub","Bad commit found in git log","git revert run on that commit","The revert pushed: the site works again","The lead's request done properly, and pushed"] }
   ];
 
   function hasStaged(S){ var ht = treeOf(S, head(S)); return Object.keys(S.index).some(function(n){ return (S.index[n] || "") !== (ht[n] || ""); }); }
@@ -869,25 +881,40 @@
   }
 
   function liveSubgoals(S){
-    if (!S.scenarioBase) return [false,false,false,false,false];
+    if (!S.scenarioBase) return [false,false,false,false,false,false];
     var base = S.scenarioBase, baseTree = treeOf(S, base), chain = sinceBase(S);
+    var baseCss = baseTree["style.css"] || "";
+    // sinceBase walks back from HEAD, so chain is newest first.
     var broke = chain.filter(function(id){
       return S.commits[id].msg.indexOf("Revert \"") !== 0 &&
-             (treeOf(S, id)["style.css"] || "") !== (baseTree["style.css"] || "");
+             (treeOf(S, id)["style.css"] || "") !== baseCss;
     });
     var g1 = broke.length > 0;
     var g2 = g1 && S.origin["main"] !== undefined && isAncestor(S, broke[broke.length - 1], S.origin["main"]);
     var g3 = S.scenarioLogged === true;
-    var g4 = chain.some(function(id){ return S.commits[id].msg.indexOf("Revert \"") === 0; });
-    var g5 = g4 && S.origin["main"] === S.branches["main"] &&
-             (treeOf(S, head(S))["style.css"] || "") === (baseTree["style.css"] || "");
-    return [g1, g2, g3, g4, g5];
+    // The first revert they made, oldest first.
+    var revertId = null;
+    for (var i = chain.length - 1; i >= 0; i--){
+      if (S.commits[chain[i]].msg.indexOf("Revert \"") === 0){ revertId = chain[i]; break; }
+    }
+    var g4 = revertId !== null;
+    // Step 5 asks only that the revert reached GitHub. Testing the working tree
+    // against baseCss instead would dead-end anyone who fixes it properly before
+    // pushing the bare revert.
+    var g5 = g4 && S.origin["main"] !== undefined && isAncestor(S, revertId, S.origin["main"]);
+    var curCss = treeOf(S, head(S))["style.css"] || "";
+    // The oldest style.css commit since base is the one that broke it, same as g2.
+    var brokenCss = g1 ? (treeOf(S, broke[broke.length - 1])["style.css"] || "") : "";
+    // Neither the old value nor the one that broke it, and on GitHub.
+    var g6 = g5 && S.origin["main"] === S.branches["main"] &&
+             curCss !== baseCss && curCss !== brokenCss;
+    return [g1, g2, g3, g4, g5, g6];
   }
   function pollSubgoals(S){
     var cur = liveSubgoals(S);
-    for (var i = 0; i < 5; i++) if (cur[i]) S.subgoalFlags[i] = true;
+    for (var i = 0; i < 6; i++) if (cur[i]) S.subgoalFlags[i] = true;
     // The last step is the real finish line, so it must hold right now, not just once upon a time.
-    if (!cur[4]) S.subgoalFlags[4] = false;
+    if (!cur[5]) S.subgoalFlags[5] = false;
     return S.subgoalFlags;
   }
 
@@ -994,6 +1021,88 @@
       s += '<text x="320" y="200" font-size="12" font-weight="700" fill="#2e9e5b" text-anchor="middle">Go back to the last one that worked.</text>';
       s += '<text x="320" y="222" font-size="12" fill="#6b7280" text-anchor="middle">Same move, same relief. Git is what gives your project the save slots.</text>';
       s += '<line x1="316" y1="8" x2="316" y2="182" stroke="#e3e6ea" stroke-dasharray="4 4"/>';
+      return s + '</svg>';
+    },
+    coop: function(){
+      // Two bands: what goes wrong if you both just save, and the habit that stops it.
+      function person(x, y, name, sub){
+        var t = '<rect x="' + x + '" y="' + y + '" width="118" height="44" rx="9" fill="#fff" stroke="#d3d7dd"/>';
+        t += '<text x="' + (x + 59) + '" y="' + (y + 20) + '" font-size="12.5" font-weight="700" fill="#1c2430" text-anchor="middle">' + name + '</text>';
+        t += '<text x="' + (x + 59) + '" y="' + (y + 35) + '" font-size="10.5" fill="#9aa0a6" text-anchor="middle">' + sub + '</text>';
+        return t;
+      }
+      function shared(x, y, stroke){
+        var t = '<rect x="' + x + '" y="' + y + '" width="130" height="44" rx="9" fill="#fff" stroke="' + stroke + '" stroke-width="2"/>';
+        t += '<text x="' + (x + 65) + '" y="' + (y + 20) + '" font-size="12.5" font-weight="700" fill="#1c2430" text-anchor="middle">The shared save</text>';
+        t += '<text x="' + (x + 65) + '" y="' + (y + 35) + '" font-size="10.5" fill="#9aa0a6" text-anchor="middle">one file, both of you</text>';
+        return t;
+      }
+      // x1 -> x2 at height y. Arrowhead sits at x2.
+      function arrow(x1, x2, y, color, dash){
+        var dir = x2 > x1 ? 1 : -1, tip = x2 - dir * 4;
+        var t = '<line x1="' + x1 + '" y1="' + y + '" x2="' + tip + '" y2="' + y + '" stroke="' + color + '" stroke-width="2"' + (dash ? ' stroke-dasharray="5 4"' : '') + '/>';
+        t += '<path d="M ' + x2 + ' ' + y + ' l ' + (-dir * 9) + ' -5 l 0 10 z" fill="' + color + '"/>';
+        return t;
+      }
+      var s = '<svg viewBox="0 0 640 268" role="img" aria-label="Two people saving into one shared file: saving blindly loses one person\'s work, downloading the other\'s first does not">';
+
+      // Band 1: both save blindly, one loses.
+      s += '<rect x="8" y="10" width="624" height="112" rx="10" fill="#fef2f2" stroke="#fecaca"/>';
+      s += '<text x="24" y="31" font-size="12" font-weight="700" fill="#b91c1c">If you both just save</text>';
+      s += person(28, 42, "You", "your laptop");
+      s += person(494, 42, "J&#243;zsi", "his laptop");
+      s += shared(255, 42, "#fecaca");
+      s += arrow(152, 249, 64, "#dc2626", false);
+      s += arrow(490, 393, 64, "#dc2626", false);
+      s += '<text x="320" y="110" font-size="11.5" font-weight="700" fill="#b91c1c" text-anchor="middle">Whoever saves second writes over the other one. That work is simply gone.</text>';
+
+      // Band 2: download first, then upload.
+      s += '<rect x="8" y="134" width="624" height="112" rx="10" fill="#f0fdf4" stroke="#bbf7d0"/>';
+      s += '<text x="24" y="155" font-size="12" font-weight="700" fill="#15803d">If you download his first</text>';
+      s += person(28, 166, "You", "your laptop");
+      s += person(494, 166, "J&#243;zsi", "his laptop");
+      s += shared(255, 166, "#bbf7d0");
+      s += arrow(249, 156, 180, "#2e9e5b", false);
+      s += '<text x="202" y="175" font-size="10.5" font-weight="700" fill="#15803d" text-anchor="middle">1. his, down</text>';
+      s += arrow(156, 249, 206, "#2e9e5b", false);
+      s += '<text x="202" y="222" font-size="10.5" font-weight="700" fill="#15803d" text-anchor="middle">2. yours, up</text>';
+      s += arrow(490, 393, 190, "#9aa0a6", true);
+      s += '<text x="441" y="211" font-size="10.5" fill="#6b7280" text-anchor="middle">he does the same</text>';
+      s += '<text x="320" y="262" font-size="12" fill="#6b7280" text-anchor="middle">Nothing is lost, and neither of you has to ask the other one to wait.</text>';
+      return s + '</svg>';
+    },
+    gitvsgithub: function(){
+      function card(x, stroke, width){
+        return '<rect x="' + x + '" y="14" width="304" height="200" rx="12" fill="#fff" stroke="' + stroke + '" stroke-width="' + width + '"/>';
+      }
+      function bullets(x, rows, fill){
+        var t = "";
+        rows.forEach(function(r, i){
+          var y = 110 + i * 26;
+          t += '<circle cx="' + (x + 22) + '" cy="' + (y - 4) + '" r="3" fill="' + fill + '"/>';
+          t += '<text x="' + (x + 34) + '" y="' + y + '" font-size="12" fill="#1c2430">' + r + '</text>';
+        });
+        return t;
+      }
+      var s = '<svg viewBox="0 0 640 250" role="img" aria-label="git is a program on your laptop, GitHub is a website holding the shared copy">';
+      s += card(8, "#d3d7dd", 1);
+      s += card(328, "#f05a28", 2);
+
+      // A laptop for git, a cloud for GitHub.
+      s += '<rect x="30" y="34" width="38" height="24" rx="3" fill="#fff" stroke="#6b7280" stroke-width="1.5"/>';
+      s += '<line x1="24" y1="60" x2="74" y2="60" stroke="#6b7280" stroke-width="1.5"/>';
+      s += '<path d="M 356 52 a 13 13 0 0 1 25 -6 a 11 11 0 0 1 17 8 a 9 9 0 0 1 -2 17 h -36 a 10 10 0 0 1 -4 -19 z" fill="#fff" stroke="#f05a28" stroke-width="1.5"/>';
+
+      s += '<text x="88" y="48" font-size="21" font-weight="700" font-family="ui-monospace,monospace" fill="#f05a28">git</text>';
+      s += '<text x="88" y="66" font-size="11.5" fill="#6b7280">a program on your laptop</text>';
+      s += '<text x="412" y="48" font-size="21" font-weight="700" font-family="ui-monospace,monospace" fill="#f05a28">GitHub</text>';
+      s += '<text x="412" y="66" font-size="11.5" fill="#6b7280">a website</text>';
+      s += '<line x1="24" y1="84" x2="296" y2="84" stroke="#f1f3f5"/>';
+      s += '<line x1="344" y1="84" x2="616" y2="84" stroke="#f1f3f5"/>';
+
+      s += bullets(8, ["keeps your save points", "works with no internet", "needs no account", "this is what you learn today"], "#2e9e5b");
+      s += bullets(328, ["holds the shared copy", "so J&#243;zsi can reach your saves", "you touch it with two commands", "the rest of it comes later"], "#f05a28");
+      s += '<text x="320" y="238" font-size="12" fill="#6b7280" text-anchor="middle">One letter apart. Two completely different things.</text>';
       return s + '</svg>';
     },
     glossary: function(){
@@ -1303,10 +1412,16 @@
     var L = currentLesson();
     t.textContent = L.title;
     num.textContent = "Lesson " + (S.lessonIndex + 1) + " / " + N;
+    var flags = L.steps ? G.pollSubgoals(S) : null;
     goal.innerHTML = L.goal;
+    if (L.goal2 && flags && flags[1]){
+      var turn = document.createElement("div");
+      turn.className = "turn";
+      turn.innerHTML = L.goal2;
+      goal.appendChild(turn);
+    }
     steps.innerHTML = "";
     if (L.steps){
-      var flags = G.pollSubgoals(S);
       var ul = document.createElement("ul"); ul.className = "steps";
       L.steps.forEach(function(label, i){
         var li = document.createElement("li");
@@ -1356,7 +1471,7 @@
     steps.innerHTML = "";
     var fin = document.createElement("div");
     fin.className = "fin";
-    fin.innerHTML = "<b>You got through it, including the part where the site went down.</b> " +
+    fin.innerHTML = "<b>You got through it, including the part where the site went down twice.</b> " +
       "Six commands, and you have used every one of them:<br>" +
       "<ul>" +
       "<li><span class=\"mono\">git status</span>: what did I change?</li>" +
@@ -1365,10 +1480,20 @@
       "<li><span class=\"mono\">git pull</span>: get everyone else's saves before they get in your way</li>" +
       "<li><span class=\"mono\">git revert &lt;hash&gt;</span>: load the last good save, even when the bad one is already public</li>" +
       "</ul>" +
-      "<p>Next: do the same on a <b>real</b> repository, in a real terminal. Make a repo on GitHub, clone it, " +
-      "change one file, and run the loop until it is boring. Boring is the goal.</p>" +
-      "<p>Branches come later, and they build on exactly this. When you are curious: " +
-      "<a href=\"https://learngitbranching.js.org/?NODEMO\" target=\"_blank\" rel=\"noopener\">Learn Git Branching</a>.</p>";
+      "<p><b>Put them in that order and you have a working day:</b></p>" +
+      "<ul class=\"loop\">" +
+      "<li><span class=\"mono\">git pull</span><em>get everyone else's work first</em></li>" +
+      "<li><span class=\"mono\">edit</span><em>do the thing you were asked to do</em></li>" +
+      "<li><span class=\"mono\">git status</span><em>what did I change?</em></li>" +
+      "<li><span class=\"mono\">git add</span><em>pick what goes in the save</em></li>" +
+      "<li><span class=\"mono\">git commit -m \"...\"</span><em>make the save point</em></li>" +
+      "<li><span class=\"mono\">git push</span><em>and now it is safe</em></li>" +
+      "</ul>" +
+      "<p>That is not one part of the job. That is the whole loop, and it goes round again tomorrow.</p>" +
+      "<p>This is not all of git, and that is fine. GitHub's own website, and the rest of it, " +
+      "come next, once you have a real project to put there.</p>" +
+      "<p>Until then: press Reset and run the whole thing again, this time without the hints. " +
+      "It should get boring. <b>Boring is the goal.</b></p>";
     goal.appendChild(fin);
     state.innerHTML = "";
     hint.style.display = "none";
