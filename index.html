@@ -84,6 +84,9 @@
   .fin ul.loop li { display:flex; gap:10px; align-items:baseline; font-size:13px; }
   .fin ul.loop li .mono { color:#f05a28; font-weight:700; flex:none; min-width:150px; }
   .fin ul.loop li em { font-style:normal; color:#6b7280; }
+  .prep { margin-top:10px; padding:8px 12px; background:#f6f8fa; border:1px solid #d3d7dd; border-radius:8px; }
+  .prep ol { margin:6px 0 0; padding-left:22px; }
+  .prep li { margin:2px 0; }
   .turn { margin-top:10px; padding-top:10px; border-top:1px dashed #d3d7dd; }
   .modal-back { position:fixed; inset:0; background:rgba(15,18,24,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:16px; }
   .modal-back.open { display:flex; }
@@ -1062,9 +1065,11 @@
     try { var s = localStorage.getItem(LANG_KEY); if (s === "hu" || s === "en") return s; } catch(e){}
     return "en";
   }
+  // ?prep: the teacher flips through the lessons with the commands that solve them. Nothing is saved.
+  var PREP = /[?&]prep(=|&|$)/.test(location.search);
   var lang = pickLang();
   G.setLang(lang);
-  try { localStorage.setItem(LANG_KEY, lang); } catch(e){}
+  if (!PREP) try { localStorage.setItem(LANG_KEY, lang); } catch(e){}
   function tr(en, hu){ return lang === "hu" ? hu : en; }
   function primerList(){ return lang === "hu" ? G.PRIMER_HU : G.PRIMER; }
   function lessonList(){ return lang === "hu" ? G.LESSONS_HU : G.LESSONS; }
@@ -1091,7 +1096,7 @@
   function setLanguage(l){
     lang = l === "hu" ? "hu" : "en";
     G.setLang(lang);
-    try { localStorage.setItem(LANG_KEY, lang); } catch(e){}
+    if (!PREP) try { localStorage.setItem(LANG_KEY, lang); } catch(e){}
     try {
       var u = new URL(location.href);
       u.searchParams.set("lang", lang);
@@ -1108,11 +1113,99 @@
   var primerOpen = false;
   var history = [];
 
+  /* ---------------- ?prep: each lesson with the commands that solve it ---------------- */
+
+  // One list per lesson. A step is a command (cmd gets the state, so a hash can be looked up)
+  // or an edit of a file. show = how it reads before the commit it points at exists.
+  function hashOf(s, msg){
+    var c = G.head(s);
+    while (c){ if (s.commits[c].msg === msg) return c; c = s.commits[c].parent; }
+    return null;
+  }
+  var PREP_SOL = [
+    [{ edit:"index.html", en:"Edit index.html: change the heading, and save", hu:"index.html szerkesztése: írd át a főcímet, és mentsd",
+       change:function(t){ return t.replace(/<h1>[^<]*<\/h1>/, "<h1>Welcome to Pixel Team</h1>"); } },
+     { cmd:"git status" }],
+    [{ cmd:"git add index.html" }, { cmd:"git status" }],
+    [{ cmd:"git commit -m \"New homepage heading\"" }],
+    [{ cmd:"git log --oneline" }],
+    [{ cmd:"git push" }],
+    [{ cmd:"git pull" }],
+    [{ cmd:"git log --oneline" },
+     { cmd:function(s){ return "git revert " + hashOf(s, "Tweak page width"); } },
+     { cmd:"git push" }],
+    [{ edit:"style.css", en:"Edit style.css: add font-size: 6em; to the body rule, and save", hu:"style.css szerkesztése: a body szabályba font-size: 6em;, és mentsd",
+       change:function(t){ return t.replace("body {\n", "body {\n  font-size: 6em;\n"); } },
+     { cmd:"git add style.css" },
+     { cmd:"git commit -m \"Bigger body text\"" },
+     { cmd:"git push" },
+     { cmd:"git log --oneline" },
+     { cmd:function(s){ return "git revert " + hashOf(s, "Bigger body text"); }, show:"git revert <hash of \"Bigger body text\">" },
+     { cmd:"git push" },
+     { edit:"style.css", en:"Edit style.css: add font-size: 1.2em; to the body rule, and save", hu:"style.css szerkesztése: a body szabályba font-size: 1.2em;, és mentsd",
+       change:function(t){ return t.replace("body {\n", "body {\n  font-size: 1.2em;\n"); } },
+     { cmd:"git add style.css" },
+     { cmd:"git commit -m \"Body text 1.2em\"" },
+     { cmd:"git push" }]
+  ];
+  var prepView = "solution", prepLines = [];
+  // Runs lesson k's solution on s. Returns the terminal entries and what each step looked like.
+  function runPrepLesson(s, k){
+    if (k === 5) G.teamworkScenario(s);
+    if (k === 7) G.scenarioSetup(s);
+    var term = [], lines = [];
+    PREP_SOL[k].forEach(function(st){
+      if (st.edit){
+        G.editFile(s, st.edit, st.change(s.working[st.edit] || ""));
+        lines.push({ text: tr(st.en, st.hu) });
+        return;
+      }
+      var c = typeof st.cmd === "function" ? st.cmd(s) : st.cmd;
+      term.push({ cmd: c, out: null });
+      var res = G.execGit(s, c);
+      if (res.out.length) term.push({ cmd: null, out: res.out });
+      lines.push({ cmd: c, show: st.show });
+    });
+    s.done[k] = true;
+    return { term: term, lines: lines };
+  }
+  // A fresh game with lessons 0..i-1 already solved, so any lesson can be opened directly.
+  function prepOpen(i){
+    var s = G.normalize(null);
+    s.primerDone = true;
+    for (var k = 0; k < i; k++) runPrepLesson(s, k);
+    if (i === 5) G.teamworkScenario(s);
+    if (i === 7) G.scenarioSetup(s);
+    s.lessonIndex = i;
+    var after = runPrepLesson(JSON.parse(JSON.stringify(s)), i);
+    if (prepView === "solution"){
+      var run = runPrepLesson(s, i);
+      history = run.term;
+      prepLines = run.lines;
+    } else {
+      history = [];
+      prepLines = after.lines;
+    }
+    S = s;
+  }
+  function prepBox(){
+    var box = document.createElement("div");
+    box.className = "prep";
+    var h = "<b>" + (prepView === "solution" ? tr("Solution, already run:", "Megoldás, már lefuttatva:") : tr("Solution:", "Megoldás:")) + "</b><ol>";
+    prepLines.forEach(function(l){
+      if (!l.cmd) h += "<li>" + esc(l.text) + "</li>";
+      else h += "<li><span class=\"mono\">" + esc(prepView === "task" && l.show ? l.show : l.cmd) + "</span></li>";
+    });
+    return box.innerHTML = h + "</ol>", box;
+  }
+
   function load(){
+    if (PREP) return null;
     try { var r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch(e){}
     return null;
   }
   function save(){
+    if (PREP) return;
     try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
   }
   function encodeCode(){
@@ -1571,6 +1664,7 @@
       turn.innerHTML = L.goal2;
       goal.appendChild(turn);
     }
+    if (PREP) goal.appendChild(prepBox());
     steps.innerHTML = "";
     if (L.steps){
       var ul = document.createElement("ul"); ul.className = "steps";
@@ -1591,6 +1685,18 @@
     err.classList.remove("open");
     renderHint();
     btns.innerHTML = "";
+    if (PREP){
+      num.textContent += prepView === "task" ? tr(" · Prep: task", " · Felkészülés: feladat") : tr(" · Prep: solution", " · Felkészülés: megoldás");
+      [[tr("← Prev", "← Előző"), "btn", S.lessonIndex === 0, function(){ gotoLesson(S.lessonIndex - 1); }],
+       [prepView === "task" ? tr("Show solution", "Megoldás mutatása") : tr("Show task", "Feladat mutatása"), "btn", false, function(){ prepView = prepView === "task" ? "solution" : "task"; gotoLesson(S.lessonIndex); }],
+       [tr("Next →", "Következő →"), "btn primary", S.lessonIndex === N - 1, function(){ gotoLesson(S.lessonIndex + 1); }]
+      ].forEach(function(b){
+        var el = document.createElement("button");
+        el.className = b[1]; el.textContent = b[0]; el.disabled = b[2]; el.onclick = b[3];
+        btns.appendChild(el);
+      });
+      return;
+    }
     var back = document.createElement("button");
     back.className = "btn"; back.textContent = tr("← Back", "← Vissza");
     back.disabled = S.lessonIndex === 0;
@@ -1687,6 +1793,14 @@
   function gotoLesson(i){
     if (i < 0) i = 0;
     if (i > FINISH) i = FINISH;
+    if (PREP){
+      if (i > N - 1) i = N - 1;
+      if (i !== S.lessonIndex) prepView = "solution";
+      prepOpen(i);
+      hintIdx = 0;
+      renderAll();
+      return;
+    }
     S.lessonIndex = i;
     hintIdx = 0;
     save();
@@ -1839,6 +1953,13 @@
 
   $("btn-lang").onclick = function(){ setLanguage(lang === "hu" ? "en" : "hu"); };
 
+  if (PREP){
+    ["btn-code", "btn-paste", "btn-reset"].forEach(function(id){ $(id).style.display = "none"; });
+    document.addEventListener("keydown", function(e){
+      if (e.altKey && (e.key === "ArrowRight" || e.key === "ArrowLeft")){ e.preventDefault(); gotoLesson(S.lessonIndex + (e.key === "ArrowRight" ? 1 : -1)); }
+    });
+    prepOpen(0);
+  }
   primerOpen = !S.primerDone;
   applyStatic();
   renderAll();

@@ -342,5 +342,43 @@ doc.getElementById("code-close").click();
   K("switching back offers Hungarian again", d.getElementById("btn-lang").textContent === "Magyarul");
 }
 
+// ---------- ?prep: every lesson opens solved, flips to the task, nothing saved
+{
+  const dp = new JSDOM(html, { runScripts: "dangerously", pretendToBeVisual: true, url: "https://gyak-prep.test/?prep" });
+  const wp = dp.window, d = wp.document;
+  const pbtn = (t) => [...d.querySelectorAll("#lesson-buttons .btn")].find(b => b.textContent.includes(t));
+  K("?prep skips the primer", d.getElementById("primer").style.display === "none");
+  K("?prep hides the progress buttons", ["btn-code", "btn-paste", "btn-reset"].every(id => d.getElementById(id).style.display === "none"));
+  for (let i = 0; i < 8; i++){
+    K("?prep lesson " + (i + 1) + " opens solved", d.getElementById("lesson-state").textContent.includes("Done"), d.getElementById("lesson-num").textContent);
+    K("?prep lesson " + (i + 1) + " lists its commands", d.querySelectorAll("#lesson-goal .prep li").length > 0);
+    if (i < 7) pbtn("Next").click();
+  }
+  K("?prep lesson 7 names the real hash", (() => { pbtn("Prev").click(); const t = d.querySelector("#lesson-goal .prep").textContent; return /git revert [0-9a-f]{7}/.test(t); })());
+  K("?prep lesson 8 shows the second half of the brief", (pbtn("Next").click(), d.querySelector("#lesson-goal .turn") !== null));
+  K("?prep lesson 8: all six steps ticked", d.querySelectorAll("#lesson-steps li.done").length === 6);
+  pbtn("Show task").click();
+  K("Show task: lesson 8 back to its start", !d.getElementById("lesson-state").textContent.includes("Done") && d.querySelectorAll("#lesson-steps li.done").length === 0);
+  K("Show task: hash written as a placeholder", d.querySelector("#lesson-goal .prep").textContent.includes('<hash of "Bigger body text">'));
+  K("Show task: terminal is empty", d.getElementById("termout").textContent === "");
+  pbtn("Show solution").click();
+  K("Show solution: solved again", d.getElementById("lesson-state").textContent.includes("Done"));
+  // Jumping straight to lesson 7 with Alt+Left still has Józsi's commits in place.
+  d.dispatchEvent(new wp.KeyboardEvent("keydown", { key: "ArrowLeft", altKey: true, bubbles: true }));
+  K("Alt+Left goes back a lesson", d.getElementById("lesson-num").textContent.startsWith("Lesson 7"));
+  K("lesson 7 in prep has Józsi's commit to revert", d.getElementById("termout").textContent.includes("Revert \"Tweak page width\""));
+  pbtn("Show task").click();
+  K("lesson 7 task view: the broken width is in the preview", (d.getElementById("preview").getAttribute("srcdoc") || "").includes("max-width: 90px;"));
+  K("?prep writes nothing to localStorage", wp.localStorage.length === 0, String(wp.localStorage.length));
+}
+{
+  const dp = new JSDOM(html, { runScripts: "dangerously", pretendToBeVisual: true, url: "https://gyak-prep-hu.test/?prep&lang=hu" });
+  const d = dp.window.document;
+  K("?prep&lang=hu: Hungarian prep buttons", [...d.querySelectorAll("#lesson-buttons .btn")].some(b => b.textContent === "Feladat mutatása"));
+  K("?prep&lang=hu: Hungarian solution label", d.querySelector("#lesson-goal .prep").textContent.includes("Megoldás"));
+  K("?prep&lang=hu: lesson solved", d.getElementById("lesson-state").textContent.includes("Kész"));
+  K("?prep&lang=hu writes nothing to localStorage", dp.window.localStorage.length === 0);
+}
+
 console.log("\n" + (fails ? fails + " FAILURES" : "ALL PASS"));
 process.exit(fails ? 1 : 0);
