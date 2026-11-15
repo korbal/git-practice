@@ -369,6 +369,7 @@ doc.getElementById("code-close").click();
   K("lesson 7 in prep has Józsi's commit to revert", d.getElementById("termout").textContent.includes("Revert \"Tweak page width\""));
   pbtn("Show task").click();
   K("lesson 7 task view: the broken width is in the preview", (d.getElementById("preview").getAttribute("srcdoc") || "").includes("max-width: 90px;"));
+  K("?prep shows no hint box", d.getElementById("lesson-hint").style.display === "none");
   K("?prep writes nothing to localStorage", wp.localStorage.length === 0, String(wp.localStorage.length));
 }
 {

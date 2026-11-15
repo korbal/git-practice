@@ -1134,7 +1134,7 @@
     [{ cmd:"git log --oneline" },
      { cmd:function(s){ return "git revert " + hashOf(s, "Tweak page width"); } },
      { cmd:"git push" }],
-    [{ edit:"style.css", en:"Edit style.css: add font-size: 6em; to the body rule, and save", hu:"style.css szerkesztése: a body szabályba font-size: 6em;, és mentsd",
+    [{ edit:"style.css", en:"Edit style.css: add font-size: 6em to the body rule, and save", hu:"style.css szerkesztése: a body szabályba írd be, hogy font-size: 6em, és mentsd",
        change:function(t){ return t.replace("body {\n", "body {\n  font-size: 6em;\n"); } },
      { cmd:"git add style.css" },
      { cmd:"git commit -m \"Bigger body text\"" },
@@ -1142,7 +1142,7 @@
      { cmd:"git log --oneline" },
      { cmd:function(s){ return "git revert " + hashOf(s, "Bigger body text"); }, show:"git revert <hash of \"Bigger body text\">" },
      { cmd:"git push" },
-     { edit:"style.css", en:"Edit style.css: add font-size: 1.2em; to the body rule, and save", hu:"style.css szerkesztése: a body szabályba font-size: 1.2em;, és mentsd",
+     { edit:"style.css", en:"Edit style.css: add font-size: 1.2em to the body rule, and save", hu:"style.css szerkesztése: a body szabályba írd be, hogy font-size: 1.2em, és mentsd",
        change:function(t){ return t.replace("body {\n", "body {\n  font-size: 1.2em;\n"); } },
      { cmd:"git add style.css" },
      { cmd:"git commit -m \"Body text 1.2em\"" },
@@ -1681,7 +1681,7 @@
     state.innerHTML = done
       ? "<span class=\"ok\">&#10003; " + tr("Done! You reached the goal.", "Kész! Megvan a cél.") + "</span>"
       : "<span class=\"wait\">&#9699; " + tr("Keep going...", "Folytasd...") + "</span>";
-    hint.style.display = L.hasHints ? "" : "none";
+    hint.style.display = L.hasHints && !PREP ? "" : "none";
     err.classList.remove("open");
     renderHint();
     btns.innerHTML = "";
@@ -1813,7 +1813,7 @@
   function renderHint(){
     var L = currentLesson();
     var hint = $("lesson-hint");
-    if (!L || !L.hasHints){
+    if (!L || !L.hasHints || PREP){
       hint.style.display = "none";
       return;
     }
