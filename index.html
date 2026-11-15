@@ -121,14 +121,15 @@
 <div class="app">
   <header>
     <div class="brand">
-      <h1>Git Practice</h1>
-      <div class="sub">save your work, break it, get it back</div>
+      <h1 data-hu="Git gyakorló">Git Practice</h1>
+      <div class="sub" data-hu="mentsd el, rontsd el, hozd vissza">save your work, break it, get it back</div>
     </div>
     <div class="dots" id="dots"></div>
-    <button class="btn" id="btn-why">Why git?</button>
-    <button class="btn" id="btn-code">Copy progress</button>
-    <button class="btn" id="btn-paste">Paste code</button>
-    <button class="btn" id="btn-reset">&#8635; Reset</button>
+    <button class="btn" id="btn-lang" lang="hu" title="Magyarra vált">Magyarul</button>
+    <button class="btn" id="btn-why" data-hu="Minek a git?">Why git?</button>
+    <button class="btn" id="btn-code" data-hu="Haladás másolása">Copy progress</button>
+    <button class="btn" id="btn-paste" data-hu="Kód beillesztése">Paste code</button>
+    <button class="btn" id="btn-reset" data-hu="&#8635; Újrakezdés">&#8635; Reset</button>
   </header>
 
   <div id="primer" style="display:none;"></div>
@@ -136,33 +137,33 @@
   <div class="grid" id="main-grid">
     <div class="lcol" id="lcol">
       <div class="card">
-        <div class="box-title"><span class="num">1</span> Working directory <span class="mono sub">(where you work)</span></div>
+        <div class="box-title" data-hu='<span class="num">1</span> Munkakönyvtár <span class="mono sub">(itt dolgozol)</span>'><span class="num">1</span> Working directory <span class="mono sub">(where you work)</span></div>
         <div class="chips" id="box-work"></div>
         <div class="arrow">&#8595;</div>
-        <div class="box-title"><span class="num">2</span> Staging <span class="mono sub">(&#34;git add&#34; puts files here)</span></div>
+        <div class="box-title" data-hu='<span class="num">2</span> Staging <span class="mono sub">(a &#34;git add&#34; ide teszi a fájlokat)</span>'><span class="num">2</span> Staging <span class="mono sub">(&#34;git add&#34; puts files here)</span></div>
         <div class="chips" id="box-stage"></div>
         <div class="arrow">&#8595;</div>
-        <div class="box-title"><span class="num">3</span> Local repo <span class="mono sub">(&#34;git commit&#34; puts files here)</span></div>
+        <div class="box-title" data-hu='<span class="num">3</span> Helyi repó <span class="mono sub">(a &#34;git commit&#34; ide teszi a fájlokat)</span>'><span class="num">3</span> Local repo <span class="mono sub">(&#34;git commit&#34; puts files here)</span></div>
         <div id="box-local" class="chips"></div>
         <div class="arrow">&#8595;</div>
-        <div class="box-title"><span class="num">4</span> GitHub <span class="mono sub">(&#34;git push&#34; puts files here)</span></div>
+        <div class="box-title" data-hu='<span class="num">4</span> GitHub <span class="mono sub">(a &#34;git push&#34; ide teszi a fájlokat)</span>'><span class="num">4</span> GitHub <span class="mono sub">(&#34;git push&#34; puts files here)</span></div>
         <div id="box-gh" class="chips"></div>
         <div class="legend">
-          <span><span class="st clean"></span> unchanged</span>
-          <span><span class="st mod"></span> modified (not staged)</span>
-          <span><span class="st staged"></span> staged (ready to commit)</span>
-          <span>click a file to edit it</span>
+          <span data-hu='<span class="st clean"></span> változatlan'><span class="st clean"></span> unchanged</span>
+          <span data-hu='<span class="st mod"></span> módosítva (nincs a stagingben)'><span class="st mod"></span> modified (not staged)</span>
+          <span data-hu='<span class="st staged"></span> a stagingben (mehet a commitba)'><span class="st staged"></span> staged (ready to commit)</span>
+          <span data-hu="kattints egy fájlra, hogy szerkeszd">click a file to edit it</span>
         </div>
       </div>
 
       <div class="card">
-        <div class="box-title">Live preview <span class="mono sub">(your working directory, rendered)</span></div>
+        <div class="box-title" data-hu='Élő előnézet <span class="mono sub">(a munkakönyvtárad, megjelenítve)</span>'>Live preview <span class="mono sub">(your working directory, rendered)</span></div>
         <iframe class="preview-frame" id="preview" sandbox title="Preview of index.html"></iframe>
-        <div class="preview-note">This is index.html with style.css applied. Scripts never run here.</div>
+        <div class="preview-note" data-hu="Ez az index.html, a style.css-sel együtt. Szkriptek itt sosem futnak.">This is index.html with style.css applied. Scripts never run here.</div>
       </div>
 
       <div class="card">
-        <div class="box-title">Commits</div>
+        <div class="box-title" data-hu="Commitok">Commits</div>
         <div class="graph" id="graph"></div>
       </div>
     </div>
@@ -192,36 +193,36 @@
 
 <div class="modal-back" id="modal-editor">
   <div class="modal">
-    <h3>Edit file: <span class="mono" id="ed-name"></span></h3>
-    <p>Saving marks the file as &#34;modified&#34; in the Working directory, and the <span class="mono">git status</span> command will show it.</p>
+    <h3><span data-hu="Fájl szerkesztése:">Edit file:</span> <span class="mono" id="ed-name"></span></h3>
+    <p data-hu='Mentés után a fájl &#34;módosított&#34; lesz a Munkakönyvtárban, és a <span class="mono">git status</span> parancs is mutatni fogja.'>Saving marks the file as &#34;modified&#34; in the Working directory, and the <span class="mono">git status</span> command will show it.</p>
     <textarea id="ed-text"></textarea>
     <div class="buttons">
-      <button class="btn primary" id="ed-save">Save</button>
-      <button class="btn" id="ed-cancel">Cancel</button>
+      <button class="btn primary" id="ed-save" data-hu="Mentés">Save</button>
+      <button class="btn" id="ed-cancel" data-hu="Mégse">Cancel</button>
     </div>
   </div>
 </div>
 
 <div class="modal-back" id="modal-code">
   <div class="modal">
-    <h3>Progress code</h3>
-    <p>Copy this code to continue on another machine. There, press the &#8222;Paste code&#8221; button, paste it in, and restore.</p>
+    <h3 data-hu="Haladási kód">Progress code</h3>
+    <p data-hu="Másold ki ezt a kódot, ha másik gépen folytatnád. Ott nyomd meg a &#8222;Kód beillesztése&#8221; gombot, illeszd be, és állítsd vissza.">Copy this code to continue on another machine. There, press the &#8222;Paste code&#8221; button, paste it in, and restore.</p>
     <textarea id="code-text"></textarea>
     <div class="buttons">
-      <button class="btn" id="code-copy">Copy code</button>
-      <button class="btn" id="code-close">Close</button>
+      <button class="btn" id="code-copy" data-hu="Kód másolása">Copy code</button>
+      <button class="btn" id="code-close" data-hu="Bezárás">Close</button>
     </div>
   </div>
 </div>
 
 <div class="modal-back" id="modal-paste">
   <div class="modal">
-    <h3>Restore progress</h3>
-    <p>Paste in a previously saved code here. <b>Careful:</b> your current progress will be overwritten.</p>
-    <textarea id="paste-text" placeholder="pasted code..."></textarea>
+    <h3 data-hu="Haladás visszaállítása">Restore progress</h3>
+    <p data-hu="Illessz be ide egy korábban elmentett kódot. <b>Vigyázz:</b> a mostani haladásod felülíródik.">Paste in a previously saved code here. <b>Careful:</b> your current progress will be overwritten.</p>
+    <textarea id="paste-text" placeholder="pasted code..." data-hu-placeholder="beillesztett kód..."></textarea>
     <div class="buttons">
-      <button class="btn primary" id="paste-load">Restore</button>
-      <button class="btn" id="paste-close">Cancel</button>
+      <button class="btn primary" id="paste-load" data-hu="Visszaállítás">Restore</button>
+      <button class="btn" id="paste-close" data-hu="Mégse">Cancel</button>
     </div>
   </div>
 </div>
@@ -231,6 +232,14 @@
   "use strict";
   /*__ENGINE_START__*/
   var W = typeof window !== "undefined" ? window : this;
+
+  // Display language. Only the trainer's own words change with it: lesson text,
+  // primer, jokes, hints. Anything real git would print stays in English,
+  // because that is what students meet in a real terminal.
+  var LANG = "en";
+  function setLang(l){ LANG = l === "hu" ? "hu" : "en"; }
+  function getLang(){ return LANG; }
+  function tr(en, hu){ return LANG === "hu" ? hu : en; }
 
   // ---- The project the student inherits: a small team website with real history.
   var F1_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Team website</title>\n</head>\n<body>\n  <h1>Welcome to our website!</h1>\n</body>\n</html>";
@@ -498,6 +507,19 @@
     open:  ["The preview under the boxes is already showing you the page."],
     help:  ["The Hint button on the right is the help you are after."]
   };
+  var SHELL_HU = {
+    sudo:  ["sudo: ez egy böngészőfül. Nincs itt semmi, aminek root-ja lehetnél."],
+    rm:    ["rm: nem történt semmi, ez a terminál csak szimuláció.",
+            "Egy igaziban azonnal megtörtént volna, kérdés nélkül. Érdemes megjegyezni."],
+    vim:   ["Itt nincs vim, úgyhogy szabadon távozhatsz.",
+            "Egyszer lesz. Kilépni így kell: Esc, aztán :q! és Enter."],
+    nano:  ["Nem kell szerkesztő. Kattints egy fájlra bal oldalt."],
+    ls:    ["A bal oldali négy doboz már ezt csinálja, ráadásul színesben."],
+    cd:    ["Egy mappa van, és abban vagy."],
+    npm:   ["Az 1200 csomag és négy perc lenne. Ma nem."],
+    open:  ["A dobozok alatti előnézet már mutatja az oldalt."],
+    help:  ["A jobb oldali Tipp gomb az a segítség, amit keresel."]
+  };
 
   function execGit(S, raw){
     var out = [];
@@ -505,7 +527,8 @@
     if (!line) return { out: out };
     var toks = tokenize(line);
     if (toks[0] !== "git"){
-      if (SHELL[toks[0]]) return { out: SHELL[toks[0]].slice() };
+      var shell = LANG === "hu" ? SHELL_HU : SHELL;
+      if (shell[toks[0]]) return { out: shell[toks[0]].slice() };
       return { out: ["bash: " + toks[0] + ": command not found"] };
     }
     if (toks.length === 1) return { out: ["usage: git <command> [<args>]"] };
@@ -595,14 +618,16 @@
         var refs = argv.filter(function(a){ return !a.startsWith("-"); });
         if (!refs.length){
           out.push("usage: git revert <commit>");
-          out.push("hint: run \"git log\" first and copy the hash of the commit you want to undo.");
+          out.push(tr("hint: run \"git log\" first and copy the hash of the commit you want to undo.",
+                      "tipp: előbb futtasd a \"git log\"-ot, és másold ki annak a commitnak a hashét, amit vissza akarsz vonni."));
           break;
         }
         var target = resolveRev(S, refs[0]);
         if (!target){ out.push("fatal: bad revision '" + refs[0] + "'"); break; }
         var par = S.commits[target].parent;
         if (par === null){
-          out.push("fatal: cannot revert the initial commit (it has nothing before it to go back to)");
+          out.push(tr("fatal: cannot revert the initial commit (it has nothing before it to go back to)",
+                      "fatal: cannot revert the initial commit (előtte nincs semmi, amihez vissza lehetne menni)"));
           break;
         }
         if (!isAncestor(S, target, h)){
@@ -621,8 +646,10 @@
         var clash = touched.filter(function(n){ return (cur[n] || "") !== (became[n] || ""); });
         if (clash.length){
           out.push("error: could not revert " + target + "... " + S.commits[target].msg);
-          out.push("hint: " + clash[0] + " has changed since that commit, so this revert would conflict.");
-          out.push("hint: revert the most recent commit that broke the file instead.");
+          out.push(tr("hint: " + clash[0] + " has changed since that commit, so this revert would conflict.",
+                      "tipp: a(z) " + clash[0] + " azóta megváltozott, ezért ez a revert ütközne."));
+          out.push(tr("hint: revert the most recent commit that broke the file instead.",
+                      "tipp: inkább a legutóbbi commitot vond vissza, ami elrontotta a fájlt."));
           break;
         }
         var dirty = touched.filter(function(n){ return (S.working[n] || "") !== (cur[n] || "") || (S.index[n] || "") !== (cur[n] || ""); });
@@ -654,7 +681,8 @@
 
       case "push": {
         if (argv.some(function(a){ return a === "-f" || a === "--force"; })){
-          out.push("(--force ignored here. On a real team it is how you delete somebody's afternoon.)");
+          out.push(tr("(--force ignored here. On a real team it is how you delete somebody's afternoon.)",
+                      "(A --force itt nem csinál semmit. Egy igazi csapatban így törlöd ki valakinek a délutánját.)"));
         }
         var local = S.branches[branch], rem = S.origin[branch];
         if (rem === undefined){
@@ -710,8 +738,10 @@
             S.ran.pull = true;
           }
         } else {
-          out.push("error: you and the remote have diverged (a real merge is out of scope in this exercise).");
-          out.push("hint: In real git you would resolve this with 'git pull --rebase' or a merge commit.");
+          out.push(tr("error: you and the remote have diverged (a real merge is out of scope in this exercise).",
+                      "error: you and the remote have diverged (egy igazi merge nem része ennek a gyakorlatnak)."));
+          out.push(tr("hint: In real git you would resolve this with 'git pull --rebase' or a merge commit.",
+                      "tipp: az igazi gitben ezt 'git pull --rebase'-zel vagy egy merge committal oldanád meg."));
         }
         break;
       }
@@ -788,15 +818,18 @@
           }
         } else {
           out.push("error: cannot merge '" + mname + "': branches have diverged.");
-          out.push("hint: In real git this would create a merge commit (or a conflict).");
-          out.push("hint: This exercise supports fast-forward merges only.");
+          out.push(tr("hint: In real git this would create a merge commit (or a conflict).",
+                      "tipp: az igazi gitben ebből merge commit lenne (vagy ütközés)."));
+          out.push(tr("hint: This exercise supports fast-forward merges only.",
+                      "tipp: ez a gyakorlat csak fast-forward merge-et tud."));
         }
         break;
       }
 
       case "blame":
-        out.push("It was Józsi.");
-        out.push("It is usually Józsi. Real git blame shows who last touched each line of a file, which is how you find out for certain.");
+        out.push(tr("It was Józsi.", "Józsi volt."));
+        out.push(tr("It is usually Józsi. Real git blame shows who last touched each line of a file, which is how you find out for certain.",
+                    "Általában Józsi. Az igazi git blame megmutatja, ki nyúlt utoljára a fájl egyes soraihoz, és így tudod meg biztosan."));
         break;
 
       default:
@@ -862,6 +895,64 @@
       goal2:"<b>Your phone rings. The site is down.</b> The live page is unreadable, and this time the bad commit is yours, not Józsi's. It is already on GitHub, so you cannot quietly delete it.<br><br>First get GitHub back to a working site, the way you did in lesson 7. Then finish the job the lead actually asked for: a sensible bigger font, <span class=\"mono\">font-size: 1.2em;</span>, committed and pushed.",
       hints:[],
       steps:["style.css changed and committed","The broken commit pushed to GitHub","Bad commit found in git log","git revert run on that commit","The revert pushed: the site works again","The lead's request done properly, and pushed"] }
+  ];
+
+  // Hungarian text for the same primer and lessons, index for index.
+  // Same metaphor (mentés, mentési pont), same order; git words stay git words.
+  var PRIMER_HU = [
+    { title: "Gondolj rá úgy, mint egy mentésre",
+      body: "Egy nehéz játék közepén jársz. A boss előtt <b>mentesz</b>. A boss megöl. <b>Betöltöd</b> a mentést, és újrapróbálod. Így jut át bárki valami nehézen.<br><br>A kódírás ugyanez: kipróbálsz dolgokat, és sok közülük elromlik. <b>A git a projekted mentési rendszere.</b> Ennyi az egész ötlet. Ami ezután jön, az már csak szókincs.",
+      art: "savepoints" },
+    { title: "Most már ketten vagytok",
+      body: "Ugyanaz a játék, de co-opban. Te és <b>Józsi</b> egy weboldalt építetek, két laptopon, ugyanazon a délutánon. Egy közös mentésfájl van, és mindketten abba mentetek.<br><br>Így is el lehet veszíteni munkát, és ennek semmi köze ahhoz, hogy elrontasz-e valamit. Ő ment. Te mentesz. Az egyikőtök a másikéra menti rá a sajátját, és az a munka eltűnt.<br><br>A szabály, ami ezt megelőzi, apró: <b>előbb töltsd le az ő mentéseit, aztán töltsd fel a sajátodat.</b> A csapatmunka nagy része ez az egy szokás. Élesben a 6. leckében csinálod meg.",
+      art: "coop" },
+    { title: "El fogod rontani",
+      body: "Nem talán. Mindenki elrontja, azok is, akik húsz éve csinálják. Csak az a kérdés, mennyi idő alatt jutsz vissza egy verzióhoz, ami működött.<br><br>Mentési rendszer nélkül két lehetőséged van: Ctrl+Z, amíg be nem zárod a szerkesztőt, vagy egy mappa tele <span class=\"mono\">final</span>, <span class=\"mono\">final-2</span> és <span class=\"mono\">REAL-final</span> nevű fájlokkal, amiket egy hét múlva senki nem tud megkülönböztetni. A másodikat valószínűleg már csináltad is.",
+      art: "folders" },
+    { title: "A git a tiéd, a GitHub a közös",
+      body: "Két név, egy betű különbséggel, és eleinte mindenki összekeveri.<br><br>A <b>git</b> egy program a laptopodon. Ez tartja a mentési pontjaidat. Nem kell hozzá internet, sem fiók, és most ezt fogod megtanulni.<br><br>A <b>GitHub</b> egy weboldal. Ott van a közös példány, így Józsi eléri a te mentéseidet, te meg az övéit. Ettől működik a co-op.<br><br>Itt is használod a GitHubot, de csak két paranccsal, és a weboldalt meg sem kell nyitnod. Fiók, saját repository és a GitHub többi része: az a kurzus után jön. Most csak az a doboz, ahová a mentéseid mennek.",
+      art: "gitvsgithub" },
+    { title: "A szavak, amikkel most találkozol",
+      body: "A gitnek saját neve van a mentési ötletekre, amiket már érted. Egyik sem bonyolult, csak szokatlan.<br><br>Ezt a diát nem kell bemagolnod. A következő húsz percben minden sorát használni fogod, és a szavak megragadnak, ha párszor begépelted őket.",
+      art: "glossary" },
+    { title: "Minden commit egy mentési pont",
+      body: "A commit az, amikor azt mondod a gitnek: ez a verzió működik, jegyezd meg. A git mindet megtartja, mindegyiket egy üzenettel arról, mi változott és miért.<br><br>Ha valami elromlik, kiválasztasz egy mentési pontot, és visszamész hozzá. Ez az ígéret, és a 7. leckében pontosan ezt fogod csinálni, egy elromlott oldallal magad előtt.",
+      art: "timeline" },
+    { title: "A kódod két helyen él",
+      body: "Egy változtatás négy dobozon megy át, mire biztonságba kerül. A <b>munkakönyvtárban</b> szerkesztesz. A <span class=\"mono\">git add</span> átteszi a változtatást a <b>stagingbe</b>: ez azoknak a dolgoknak a kupaca, amiket mindjárt elmentesz. A <span class=\"mono\">git commit</span> ebből a kupacból mentési pontot csinál a <b>helyi repódban</b>. A <span class=\"mono\">git push</span> feltölti a <b>GitHubra</b>, ez a felhőmentés.<br><br>Minek négy? Mert az utolsó éli túl. Ha meghal a laptop, vagy kávé ömlik a billentyűzetre, a munkád még megvan a GitHubon. Ez a négy doboz innentől minden lecke bal oldalán ott lesz.",
+      art: "boxes" },
+    { title: "Ez a szakma",
+      body: "Minden fejlesztőcsapat, ahová valaha bekerülsz, gitet használ. Nem a legtöbb. Mind.<br><br>Ez egyben a portfóliód is, amit megnéznek. Egy GitHub-profil megmutatja, mit építesz és hogyan dolgozol, hosszabb időn át. Ez több, mint amit egy önéletrajz el tud mondani.<br><br>A jó hír, hogy milyen kevés kell hozzá. Hat parancs lefedi a legtöbb munkanapot, és mindjárt mindegyiket használni fogod.",
+      art: "commands" }
+  ];
+
+  var LESSONS_HU = [
+    { num:1, title:"Mit változtattam az előbb: git status", hasHints:true,
+      goal:"Ezt a projektet az előző csoporttól örökölted. Kattints az <b>index.html</b>-re a Munkakönyvtár dobozban, változtass meg benne valamit (a főcím jó kezdés), és mentsd el. Aztán kérdezd meg a gitet, mit vett észre: <span class=\"mono\">git status</span>",
+      hints:["Az index.html-re kattintva megnyílik a szerkesztő.","Mentés után figyeld, ahogy a dobozok alatti előnézet megváltozik, és a fájl narancssárga lesz.","A git status az a parancs, amit a legtöbbször fogsz futtatni. Arra felel: mit változtattam, és mit nem mentettem még el? A „Changes not staged for commit” azt jelenti: változott, de még nincs kijelölve mentésre."] },
+    { num:2, title:"Mi kerüljön a mentésbe: git add", hasHints:true,
+      goal:"A változtatásod csak a Munkakönyvtárban van, ahol semmi nem védi. Tedd át a <b>Stagingbe</b>, a következő mentésbe kerülő dolgok kupacába: <span class=\"mono\">git add index.html</span>, aztán megint <span class=\"mono\">git status</span>.",
+      hints:["A git add választja ki, mely változtatások kerüljenek a következő mentési pontba. Nem mindig akarod mindet.","A git add után a fájl megjelenik a Staging dobozban, kékkel.","A git status most a „Changes to be committed” alatt mutatja. Ez annyit jelent: ezek mennek a következő commitba."] },
+    { num:3, title:"Mentési pont készítése: git commit", hasHints:true,
+      goal:"Amit a stagingbe tettél, abból csinálj mentési pontot: <span class=\"mono\">git commit -m \"az üzeneted\"</span>",
+      hints:["A -m után jön az üzenet, idézőjelben. Írd le, mi változott és miért, a jövő hónapbeli önmagadnak.","Példa: git commit -m \"Új főcím a főoldalon\"","Utána futtasd a git statust: a „working tree clean” azt jelenti, hogy nincs elmentetlen változás."] },
+    { num:4, title:"A mentési helyeid: git log", hasHints:true,
+      goal:"Nyisd meg a mentések listáját. A projekt összes mentési pontja, a legújabb legfelül: <span class=\"mono\">git log --oneline</span>",
+      hints:["Minden sor egy mentési hely: egy hash (az azonosítója) és az üzenet, amit a készítője írt.","A tiéd van legfelül, alatta azok, amiket örököltél.","Ezekkel a hashekkel tudsz később egy régi mentésre mutatni. A 7. leckében szükséged lesz egyre."] },
+    { num:5, title:"Felhőmentés: git push", hasHints:true,
+      goal:"A mentési pontjaid csak ezen a laptopon léteznek, és a laptopok meghalnak. Küldd fel őket a <b>GitHubra</b>: <span class=\"mono\">git push</span>",
+      hints:["A git push feltölti a helyi mentési pontjaidat a szerverre (4. doboz).","Push előtt a git status azt írja: „ahead of origin/main”. Vagyis a felhős példány le van maradva mögötted.","Push után azt írja: „up to date”. Innentől egy halott laptop semmibe nem kerül."] },
+    { num:6, title:"Józsi közben mentett: git pull", hasHints:true,
+      goal:"A co-op probléma a bevezetőből, élesben. Amíg dolgoztál, <b>Józsi</b> feltöltött <b>2 saját commitot</b>. Töltsd le őket, mielőtt bármihez hozzányúlsz: <span class=\"mono\">git pull</span><br><br>Aztán nézd meg az előnézetet. Józsi csinált valamit.",
+      hints:["A git pull letölti a másik ember mentési pontjait a helyi repódba és a fájljaid közé.","Pullolj, mielőtt nekiállsz dolgozni, és mielőtt pusholsz. Sok vitát megspórol.","Ha megjött, hasonlítsd össze az előnézetet azzal, ahogy tíz másodperce kinézett."] },
+    { num:7, title:"Vissza az utolsó jó mentéshez: git revert", hasHints:true,
+      goal:"Józsi második commitja szétszedte az oldal elrendezését, és már fent van a GitHubon, így nem törölheted ki csendben. Ehelyett <b>visszavonod</b>:<br><br>1. <span class=\"mono\">git log --oneline</span>, és keresd meg a commitot, ami elrontotta<br>2. <span class=\"mono\">git revert &lt;hash&gt;</span> annak a commitnak a hashével<br>3. <span class=\"mono\">git push</span>",
+      hints:["Keresd azt, amelyiknek „Tweak page width” a neve. Józsi minden commitüzenete ilyen. Másold ki a hashét, a rövid kódot a sor elején.","A git revert nem törli a múltat. Új mentési pontot csinál, ami visszacsinálja a régit. Ezért biztonságos olyan munkán is, ami már másoknál is megvan.","A revert után az előnézetnek megint jónak kell lennie. Aztán pusholj, hogy a felhőmentés is megkapja a javítást."] },
+    { num:8, title:"Most te jössz, tippek nélkül", hasHints:false,
+      goal:"Most élesben, tippek nélkül.<br><br>A csapatvezetőd nagyobb szöveget szeretne a főoldalon. Nyisd meg a <b>style.css</b>-t, írd be a <span class=\"mono\">font-size: 6em;</span> sort a <span class=\"mono\">body</span> szabályba, aztán mentsd, commitold és pushold, mint bármelyik másik változtatást.",
+      goal2:"<b>Csörög a telefonod. Leállt az oldal.</b> Az élő oldal olvashatatlan, és ezúttal a rossz commit a tiéd, nem Józsié. Már fent van a GitHubon, így nem törölheted ki csendben.<br><br>Először hozd vissza a GitHubon a működő oldalt, ahogy a 7. leckében. Aztán csináld meg rendesen, amit a vezető kért: egy értelmes nagyobb betűméret, <span class=\"mono\">font-size: 1.2em;</span>, commitolva és pusholva.",
+      hints:[],
+      steps:["A style.css megváltoztatva és commitolva","A rossz commit felpusholva a GitHubra","A rossz commit megtalálva a git logban","git revert lefuttatva arra a commitra","A revert felpusholva: az oldal újra működik","A vezető kérése rendesen megcsinálva és pusholva"] }
   ];
 
   function hasStaged(S){ var ht = treeOf(S, head(S)); return Object.keys(S.index).some(function(n){ return (S.index[n] || "") !== (ht[n] || ""); }); }
@@ -951,6 +1042,7 @@
 
   W.__GYT = { newGame:newGame, normalize:normalize, execGit:execGit, editFile:editFile,
                PRIMER:PRIMER, LESSONS:LESSONS, HISTORY:HISTORY, accepts:accepts,
+               PRIMER_HU:PRIMER_HU, LESSONS_HU:LESSONS_HU, setLang:setLang, getLang:getLang, tr:tr,
                pollSubgoals:pollSubgoals, liveSubgoals:liveSubgoals, scenarioSetup:scenarioSetup,
                teamworkScenario:teamworkScenario, resolveRev:resolveRev,
                treeOf:treeOf, head:head, statusText:statusText };
@@ -963,6 +1055,51 @@
   "use strict";
   var G = window.__GYT;
   var KEY = "git-gyakorlo-v1";
+  var LANG_KEY = "git-gyakorlo-lang";
+  // ?lang=hu in the URL wins, then the last choice on this browser, then English.
+  function pickLang(){
+    try { var q = new URLSearchParams(location.search).get("lang"); if (q === "hu" || q === "en") return q; } catch(e){}
+    try { var s = localStorage.getItem(LANG_KEY); if (s === "hu" || s === "en") return s; } catch(e){}
+    return "en";
+  }
+  var lang = pickLang();
+  G.setLang(lang);
+  try { localStorage.setItem(LANG_KEY, lang); } catch(e){}
+  function tr(en, hu){ return lang === "hu" ? hu : en; }
+  function primerList(){ return lang === "hu" ? G.PRIMER_HU : G.PRIMER; }
+  function lessonList(){ return lang === "hu" ? G.LESSONS_HU : G.LESSONS; }
+
+  // Static text in the page carries its Hungarian in data-hu; the English is kept on first swap.
+  function applyStatic(){
+    document.documentElement.lang = lang;
+    document.title = tr("Git Practice", "Git gyakorló");
+    document.querySelectorAll("[data-hu]").forEach(function(el){
+      if (el.dataset.en === undefined) el.dataset.en = el.innerHTML;
+      el.innerHTML = lang === "hu" ? el.dataset.hu : el.dataset.en;
+    });
+    document.querySelectorAll("[data-hu-placeholder]").forEach(function(el){
+      if (el.dataset.enPlaceholder === undefined) el.dataset.enPlaceholder = el.getAttribute("placeholder") || "";
+      el.setAttribute("placeholder", lang === "hu" ? el.dataset.huPlaceholder : el.dataset.enPlaceholder);
+    });
+    var b = document.getElementById("btn-lang");
+    b.textContent = lang === "hu" ? "In English" : "Magyarul";
+    b.setAttribute("lang", lang === "hu" ? "en" : "hu");
+    b.title = lang === "hu" ? "Switch to English" : "Magyarra vált";
+    var pv = document.getElementById("preview");
+    if (pv) pv.title = tr("Preview of index.html", "Az index.html előnézete");
+  }
+  function setLanguage(l){
+    lang = l === "hu" ? "hu" : "en";
+    G.setLang(lang);
+    try { localStorage.setItem(LANG_KEY, lang); } catch(e){}
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set("lang", lang);
+      window.history.replaceState(null, "", u.toString());
+    } catch(e){}
+    applyStatic();
+    renderAll();
+  }
   var S = G.normalize(load());
   var N = G.LESSONS.length;
   var FINISH = N;
@@ -991,7 +1128,7 @@
   function closeModals(){ document.querySelectorAll(".modal-back").forEach(function(m){ m.classList.remove("open"); }); }
 
   var currentLesson = function(){
-    return S.lessonIndex < N ? G.LESSONS[S.lessonIndex] : null;
+    return S.lessonIndex < N ? lessonList()[S.lessonIndex] : null;
   };
   function isDone(){ return S.lessonIndex < N && G.accepts[S.lessonIndex] && G.accepts[S.lessonIndex](S) === true; }
 
@@ -1000,10 +1137,10 @@
   var ART = {
     savepoints: function(){
       var cols = [
-        { head: "In a game", x: 8, rows: [["Before the boss", "2h 14m", 0], ["Boss defeated", "2h 41m", 0], ["Everything on fire", "2h 43m", 1]] },
-        { head: "In your code", x: 332, rows: [["Homepage finished", "Tue 14:02", 0], ["Contact page added", "Tue 16:30", 0], ["Layout completely broken", "Wed 09:15", 1]] }
+        { head: tr("In a game", "Egy játékban"), x: 8, rows: [[tr("Before the boss", "A boss előtt"), tr("2h 14m", "2ó 14p"), 0], [tr("Boss defeated", "Boss legyőzve"), tr("2h 41m", "2ó 41p"), 0], [tr("Everything on fire", "Minden lángokban"), tr("2h 43m", "2ó 43p"), 1]] },
+        { head: tr("In your code", "A kódodban"), x: 332, rows: [[tr("Homepage finished", "Kész a főoldal"), tr("Tue 14:02", "K 14:02"), 0], [tr("Contact page added", "Kapcsolat oldal hozzáadva"), tr("Tue 16:30", "K 16:30"), 0], [tr("Layout completely broken", "Az oldal teljesen szétesett"), tr("Wed 09:15", "Sze 09:15"), 1]] }
       ];
-      var s = '<svg viewBox="0 0 640 236" role="img" aria-label="Three save slots in a game next to three save points in a code project, each with an arrow going back to the last good one">';
+      var s = '<svg viewBox="0 0 640 236" role="img" aria-label="' + tr("Three save slots in a game next to three save points in a code project, each with an arrow going back to the last good one", "Három mentés egy játékban és három mentési pont egy kódprojektben, mindkettőnél egy nyíl vissza az utolsó jóhoz") + '">';
       cols.forEach(function(c){
         s += '<text x="' + c.x + '" y="16" font-size="13" font-weight="700" fill="#1c2430">' + c.head + '</text>';
         c.rows.forEach(function(r, i){
@@ -1018,8 +1155,8 @@
         s += '<path d="M ' + ax + ' 155 C ' + (ax + 20) + ' 150, ' + (ax + 20) + ' 100, ' + ax + ' 100" fill="none" stroke="#2e9e5b" stroke-width="2"/>';
         s += '<path d="M ' + ax + ' 100 l 11 -3 l -4 11 z" fill="#2e9e5b"/>';
       });
-      s += '<text x="320" y="200" font-size="12" font-weight="700" fill="#2e9e5b" text-anchor="middle">Go back to the last one that worked.</text>';
-      s += '<text x="320" y="222" font-size="12" fill="#6b7280" text-anchor="middle">Same move, same relief. Git is what gives your project the save slots.</text>';
+      s += '<text x="320" y="200" font-size="12" font-weight="700" fill="#2e9e5b" text-anchor="middle">' + tr("Go back to the last one that worked.", "Vissza az utolsóhoz, ami működött.") + '</text>';
+      s += '<text x="320" y="222" font-size="12" fill="#6b7280" text-anchor="middle">' + tr("Same move, same relief. Git is what gives your project the save slots.", "Ugyanaz a mozdulat, ugyanaz a megkönnyebbülés. A git adja a projektednek a mentéseket.") + '</text>';
       s += '<line x1="316" y1="8" x2="316" y2="182" stroke="#e3e6ea" stroke-dasharray="4 4"/>';
       return s + '</svg>';
     },
@@ -1033,8 +1170,8 @@
       }
       function shared(x, y, stroke){
         var t = '<rect x="' + x + '" y="' + y + '" width="130" height="44" rx="9" fill="#fff" stroke="' + stroke + '" stroke-width="2"/>';
-        t += '<text x="' + (x + 65) + '" y="' + (y + 20) + '" font-size="12.5" font-weight="700" fill="#1c2430" text-anchor="middle">The shared save</text>';
-        t += '<text x="' + (x + 65) + '" y="' + (y + 35) + '" font-size="10.5" fill="#9aa0a6" text-anchor="middle">one file, both of you</text>';
+        t += '<text x="' + (x + 65) + '" y="' + (y + 20) + '" font-size="12.5" font-weight="700" fill="#1c2430" text-anchor="middle">' + tr("The shared save", "A közös mentés") + '</text>';
+        t += '<text x="' + (x + 65) + '" y="' + (y + 35) + '" font-size="10.5" fill="#9aa0a6" text-anchor="middle">' + tr("one file, both of you", "egy fájl, kettőtöké") + '</text>';
         return t;
       }
       // x1 -> x2 at height y. Arrowhead sits at x2.
@@ -1044,31 +1181,31 @@
         t += '<path d="M ' + x2 + ' ' + y + ' l ' + (-dir * 9) + ' -5 l 0 10 z" fill="' + color + '"/>';
         return t;
       }
-      var s = '<svg viewBox="0 0 640 268" role="img" aria-label="Two people saving into one shared file: saving blindly loses one person\'s work, downloading the other\'s first does not">';
+      var s = '<svg viewBox="0 0 640 268" role="img" aria-label="' + tr("Two people saving into one shared file: saving blindly loses one person's work, downloading the other's first does not", "Két ember ment egy közös fájlba: ha vakon mentenek, az egyikük munkája elvész, ha előbb letöltik a másikét, nem") + '">';
 
       // Band 1: both save blindly, one loses.
       s += '<rect x="8" y="10" width="624" height="112" rx="10" fill="#fef2f2" stroke="#fecaca"/>';
-      s += '<text x="24" y="31" font-size="12" font-weight="700" fill="#b91c1c">If you both just save</text>';
-      s += person(28, 42, "You", "your laptop");
-      s += person(494, 42, "J&#243;zsi", "his laptop");
+      s += '<text x="24" y="31" font-size="12" font-weight="700" fill="#b91c1c">' + tr("If you both just save", "Ha mindketten csak mentetek") + '</text>';
+      s += person(28, 42, tr("You", "Te"), tr("your laptop", "a laptopod"));
+      s += person(494, 42, "J&#243;zsi", tr("his laptop", "az ő laptopja"));
       s += shared(255, 42, "#fecaca");
       s += arrow(152, 249, 64, "#dc2626", false);
       s += arrow(490, 393, 64, "#dc2626", false);
-      s += '<text x="320" y="110" font-size="11.5" font-weight="700" fill="#b91c1c" text-anchor="middle">Whoever saves second writes over the other one. That work is simply gone.</text>';
+      s += '<text x="320" y="110" font-size="11.5" font-weight="700" fill="#b91c1c" text-anchor="middle">' + tr("Whoever saves second writes over the other one. That work is simply gone.", "Aki másodiknak ment, felülírja a másikét. Az a munka egyszerűen eltűnik.") + '</text>';
 
       // Band 2: download first, then upload.
       s += '<rect x="8" y="134" width="624" height="112" rx="10" fill="#f0fdf4" stroke="#bbf7d0"/>';
-      s += '<text x="24" y="155" font-size="12" font-weight="700" fill="#15803d">If you download his first</text>';
-      s += person(28, 166, "You", "your laptop");
-      s += person(494, 166, "J&#243;zsi", "his laptop");
+      s += '<text x="24" y="155" font-size="12" font-weight="700" fill="#15803d">' + tr("If you download his first", "Ha előbb az övét töltöd le") + '</text>';
+      s += person(28, 166, tr("You", "Te"), tr("your laptop", "a laptopod"));
+      s += person(494, 166, "J&#243;zsi", tr("his laptop", "az ő laptopja"));
       s += shared(255, 166, "#bbf7d0");
       s += arrow(249, 156, 180, "#2e9e5b", false);
-      s += '<text x="202" y="175" font-size="10.5" font-weight="700" fill="#15803d" text-anchor="middle">1. his, down</text>';
+      s += '<text x="202" y="175" font-size="10.5" font-weight="700" fill="#15803d" text-anchor="middle">' + tr("1. his, down", "1. az övé, le") + '</text>';
       s += arrow(156, 249, 206, "#2e9e5b", false);
-      s += '<text x="202" y="222" font-size="10.5" font-weight="700" fill="#15803d" text-anchor="middle">2. yours, up</text>';
+      s += '<text x="202" y="222" font-size="10.5" font-weight="700" fill="#15803d" text-anchor="middle">' + tr("2. yours, up", "2. a tiéd, fel") + '</text>';
       s += arrow(490, 393, 190, "#9aa0a6", true);
-      s += '<text x="441" y="211" font-size="10.5" fill="#6b7280" text-anchor="middle">he does the same</text>';
-      s += '<text x="320" y="262" font-size="12" fill="#6b7280" text-anchor="middle">Nothing is lost, and neither of you has to ask the other one to wait.</text>';
+      s += '<text x="441" y="211" font-size="10.5" fill="#6b7280" text-anchor="middle">' + tr("he does the same", "ő is ugyanígy") + '</text>';
+      s += '<text x="320" y="262" font-size="12" fill="#6b7280" text-anchor="middle">' + tr("Nothing is lost, and neither of you has to ask the other one to wait.", "Semmi nem vész el, és egyikőtöknek sem kell megkérnie a másikat, hogy várjon.") + '</text>';
       return s + '</svg>';
     },
     gitvsgithub: function(){
@@ -1084,7 +1221,7 @@
         });
         return t;
       }
-      var s = '<svg viewBox="0 0 640 250" role="img" aria-label="git is a program on your laptop, GitHub is a website holding the shared copy">';
+      var s = '<svg viewBox="0 0 640 250" role="img" aria-label="' + tr("git is a program on your laptop, GitHub is a website holding the shared copy", "A git egy program a laptopodon, a GitHub egy weboldal, ahol a közös példány van") + '">';
       s += card(8, "#d3d7dd", 1);
       s += card(328, "#f05a28", 2);
 
@@ -1094,19 +1231,27 @@
       s += '<path d="M 356 52 a 13 13 0 0 1 25 -6 a 11 11 0 0 1 17 8 a 9 9 0 0 1 -2 17 h -36 a 10 10 0 0 1 -4 -19 z" fill="#fff" stroke="#f05a28" stroke-width="1.5"/>';
 
       s += '<text x="88" y="48" font-size="21" font-weight="700" font-family="ui-monospace,monospace" fill="#f05a28">git</text>';
-      s += '<text x="88" y="66" font-size="11.5" fill="#6b7280">a program on your laptop</text>';
+      s += '<text x="88" y="66" font-size="11.5" fill="#6b7280">' + tr("a program on your laptop", "egy program a laptopodon") + '</text>';
       s += '<text x="412" y="48" font-size="21" font-weight="700" font-family="ui-monospace,monospace" fill="#f05a28">GitHub</text>';
-      s += '<text x="412" y="66" font-size="11.5" fill="#6b7280">a website</text>';
+      s += '<text x="412" y="66" font-size="11.5" fill="#6b7280">' + tr("a website", "egy weboldal") + '</text>';
       s += '<line x1="24" y1="84" x2="296" y2="84" stroke="#f1f3f5"/>';
       s += '<line x1="344" y1="84" x2="616" y2="84" stroke="#f1f3f5"/>';
 
-      s += bullets(8, ["keeps your save points", "works with no internet", "needs no account", "this is what you learn today"], "#2e9e5b");
-      s += bullets(328, ["holds the shared copy", "so J&#243;zsi can reach your saves", "you touch it with two commands", "the rest of it comes later"], "#f05a28");
-      s += '<text x="320" y="238" font-size="12" fill="#6b7280" text-anchor="middle">One letter apart. Two completely different things.</text>';
+      s += bullets(8, lang === "hu" ? ["ez tartja a mentési pontjaidat", "internet nélkül is működik", "nem kell hozzá fiók", "ma ezt tanulod meg"] : ["keeps your save points", "works with no internet", "needs no account", "this is what you learn today"], "#2e9e5b");
+      s += bullets(328, lang === "hu" ? ["itt van a közös példány", "így J&#243;zsi eléri a mentéseidet", "két paranccsal éred el", "a többi része később jön"] : ["holds the shared copy", "so J&#243;zsi can reach your saves", "you touch it with two commands", "the rest of it comes later"], "#f05a28");
+      s += '<text x="320" y="238" font-size="12" fill="#6b7280" text-anchor="middle">' + tr("One letter apart. Two completely different things.", "Egy betű különbség. Két teljesen különböző dolog.") + '</text>';
       return s + '</svg>';
     },
     glossary: function(){
-      var rows = [
+      var rows = lang === "hu" ? [
+        ["egy mentési pont", "egy commit"],
+        ["a cetli a mentésen", "a commit üzenet"],
+        ["a mentéseid listája", "git log"],
+        ["egy régebbi mentés betöltése", "git revert"],
+        ["a mappa, amit a git figyel", "a repository („repó”)"],
+        ["a felhőmentés", "GitHub (a „remote”)"],
+        ["a tiéd fel / az övék le", "git push / git pull"]
+      ] : [
         ["a save point", "a commit"],
         ["the note you put on the save", "a commit message"],
         ["your list of saves", "git log"],
@@ -1115,9 +1260,9 @@
         ["the cloud save", "GitHub (the “remote”)"],
         ["uploading yours / downloading theirs", "git push / git pull"]
       ];
-      var s = '<svg viewBox="0 0 640 246" role="img" aria-label="Everyday words on the left matched to the git word for each on the right">';
-      s += '<text x="248" y="16" font-size="12" font-weight="700" fill="#6b7280" text-anchor="end">What you would call it</text>';
-      s += '<text x="300" y="16" font-size="12" font-weight="700" fill="#f05a28">What git calls it</text>';
+      var s = '<svg viewBox="0 0 640 246" role="img" aria-label="' + tr("Everyday words on the left matched to the git word for each on the right", "Bal oldalt a hétköznapi szavak, jobb oldalt mindegyikhez a git szava") + '">';
+      s += '<text x="248" y="16" font-size="12" font-weight="700" fill="#6b7280" text-anchor="end">' + tr("What you would call it", "Ahogy te hívnád") + '</text>';
+      s += '<text x="300" y="16" font-size="12" font-weight="700" fill="#f05a28">' + tr("What git calls it", "Ahogy a git hívja") + '</text>';
       rows.forEach(function(r, i){
         var y = 32 + i * 30;
         s += '<text x="248" y="' + (y + 16) + '" font-size="12.5" fill="#1c2430" text-anchor="end">' + r[0] + '</text>';
@@ -1131,9 +1276,9 @@
     folders: function(){
       var bad = ["index.html","index-final.html","index-final-2.html","index-REAL-final.html","index-use-this-one.html"];
       var good = [["a41f9c2","Add footer"],["7d02e18","List our work"],["31d8d25","Add hero section"],["2041e41","Add navigation bar"],["10b43d4","Initial commit"]];
-      var s = '<svg viewBox="0 0 640 230" role="img" aria-label="A folder of confusingly named files next to a clean list of commits">';
-      s += '<text x="8" y="18" font-size="13" font-weight="700" fill="#b91c1c">Without git</text>';
-      s += '<text x="330" y="18" font-size="13" font-weight="700" fill="#2e9e5b">With git</text>';
+      var s = '<svg viewBox="0 0 640 230" role="img" aria-label="' + tr("A folder of confusingly named files next to a clean list of commits", "Egy mappa összezavaró nevű fájlokkal, mellette egy tiszta commitlista") + '">';
+      s += '<text x="8" y="18" font-size="13" font-weight="700" fill="#b91c1c">' + tr("Without git", "Git nélkül") + '</text>';
+      s += '<text x="330" y="18" font-size="13" font-weight="700" fill="#2e9e5b">' + tr("With git", "Gittel") + '</text>';
       bad.forEach(function(n,i){
         var y = 34 + i * 34;
         s += '<rect x="8" y="' + y + '" width="290" height="26" rx="6" fill="#fef2f2" stroke="#fecaca"/>';
@@ -1150,8 +1295,10 @@
       return s + '</svg>';
     },
     timeline: function(){
-      var pts = [["Initial commit",0],["Add navigation",0],["Add hero",0],["List our work",0],["Broke the layout",1],["Back to working",2]];
-      var s = '<svg viewBox="0 0 640 200" role="img" aria-label="A row of commits with one broken commit and an arrow back to the last working one">';
+      var pts = lang === "hu"
+        ? [["Első commit",0],["Navigáció",0],["Hero rész",0],["Munkáink",0],["Szétesett",1],["Újra működik",2]]
+        : [["Initial commit",0],["Add navigation",0],["Add hero",0],["List our work",0],["Broke the layout",1],["Back to working",2]];
+      var s = '<svg viewBox="0 0 640 200" role="img" aria-label="' + tr("A row of commits with one broken commit and an arrow back to the last working one", "Commitok sora, köztük egy rossz, és egy nyíl vissza az utolsó működőhöz") + '">';
       s += '<line x1="40" y1="90" x2="600" y2="90" stroke="#e3e6ea" stroke-width="2"/>';
       pts.forEach(function(p,i){
         var x = 45 + i * 102;
@@ -1164,14 +1311,14 @@
       s += '<path d="M 555 72 C 540 34, 400 34, 366 68" fill="none" stroke="#2e9e5b" stroke-width="2" stroke-dasharray="5 4"/>';
       s += '<path d="M 366 68 l 10 -9 l 1 12 z" fill="#2e9e5b"/>';
       s += '<text x="460" y="26" font-size="12" font-weight="700" fill="#2e9e5b" text-anchor="middle">git revert</text>';
-      s += '<text x="320" y="170" font-size="12" fill="#6b7280" text-anchor="middle">Every dot is a version you can come back to.</text>';
+      s += '<text x="320" y="170" font-size="12" fill="#6b7280" text-anchor="middle">' + tr("Every dot is a version you can come back to.", "Minden pötty egy verzió, ahová vissza tudsz térni.") + '</text>';
       return s + '</svg>';
     },
     boxes: function(){
-      var names = ["Working directory","Staging","Local repo","GitHub"];
-      var subs = ["you edit here","what you picked","your save points","the cloud save"];
+      var names = lang === "hu" ? ["Munkakönyvtár","Staging","Helyi repó","GitHub"] : ["Working directory","Staging","Local repo","GitHub"];
+      var subs = lang === "hu" ? ["itt szerkesztesz","amit kiválasztottál","a mentési pontjaid","a felhőmentés"] : ["you edit here","what you picked","your save points","the cloud save"];
       var cmds = ["git add","git commit","git push"];
-      var s = '<svg viewBox="0 0 640 200" role="img" aria-label="Four boxes: working directory, staging, local repo and GitHub, joined by git add, git commit and git push">';
+      var s = '<svg viewBox="0 0 640 200" role="img" aria-label="' + tr("Four boxes: working directory, staging, local repo and GitHub, joined by git add, git commit and git push", "Négy doboz: munkakönyvtár, staging, helyi repó és GitHub, köztük a git add, a git commit és a git push") + '">';
       names.forEach(function(n,i){
         var x = 8 + i * 158;
         s += '<rect x="' + x + '" y="46" width="134" height="72" rx="10" fill="#fff" stroke="' + (i === 3 ? "#f05a28" : "#d3d7dd") + '" stroke-width="' + (i === 3 ? 2 : 1) + '"/>';
@@ -1185,13 +1332,16 @@
           s += '<text x="' + (ax + 12) + '" y="140" font-size="11" font-family="ui-monospace,monospace" fill="#f05a28" text-anchor="middle">' + cmds[i] + '</text>';
         }
       });
-      s += '<text x="320" y="178" font-size="12" fill="#6b7280" text-anchor="middle">git pull brings box 4 back down to box 1 when someone else saved before you.</text>';
+      s += '<text x="320" y="178" font-size="12" fill="#6b7280" text-anchor="middle">' + tr("git pull brings box 4 back down to box 1 when someone else saved before you.", "A git pull hozza le a 4. dobozt az 1.-be, ha valaki előtted mentett.") + '</text>';
       return s + '</svg>';
     },
     commands: function(){
-      var rows = [["git status","what did I change?"],["git add","pick what to save"],["git commit","save it, with a note"],
-                  ["git push","cloud save it"],["git pull","download the team's saves"],["git revert","load the last good one"]];
-      var s = '<svg viewBox="0 0 640 220" role="img" aria-label="The six git commands this course teaches and what each one does">';
+      var rows = lang === "hu"
+        ? [["git status","mit változtattam?"],["git add","mi kerüljön a mentésbe"],["git commit","mentés, egy cetlivel"],
+           ["git push","felhőmentés"],["git pull","a csapat mentéseinek letöltése"],["git revert","vissza az utolsó jóhoz"]]
+        : [["git status","what did I change?"],["git add","pick what to save"],["git commit","save it, with a note"],
+           ["git push","cloud save it"],["git pull","download the team's saves"],["git revert","load the last good one"]];
+      var s = '<svg viewBox="0 0 640 220" role="img" aria-label="' + tr("The six git commands this course teaches and what each one does", "A hat git parancs, amit ez a kurzus tanít, és hogy mit csinál mindegyik") + '">';
       rows.forEach(function(r,i){
         var col = i % 2, row = Math.floor(i / 2);
         var x = 8 + col * 316, y = 14 + row * 64;
@@ -1199,7 +1349,7 @@
         s += '<text x="' + (x + 16) + '" y="' + (y + 22) + '" font-size="13" font-weight="700" font-family="ui-monospace,monospace" fill="#f05a28">' + r[0] + '</text>';
         s += '<text x="' + (x + 16) + '" y="' + (y + 40) + '" font-size="12" fill="#6b7280">' + r[1] + '</text>';
       });
-      s += '<text x="320" y="212" font-size="12" fill="#6b7280" text-anchor="middle">Six commands. That is most of what a working developer types all day.</text>';
+      s += '<text x="320" y="212" font-size="12" fill="#6b7280" text-anchor="middle">' + tr("Six commands. That is most of what a working developer types all day.", "Hat parancs. Egy fejlesztő egész nap nagyjából ezeket gépeli.") + '</text>';
       return s + '</svg>';
     }
   };
@@ -1213,24 +1363,25 @@
     }
     wrap.style.display = "";
     grid.style.display = "none";
-    var P = G.PRIMER[primerIdx];
-    var last = primerIdx === G.PRIMER.length - 1;
+    var PR = primerList();
+    var P = PR[primerIdx];
+    var last = primerIdx === PR.length - 1;
     var dots = "";
-    for (var i = 0; i < G.PRIMER.length; i++){
+    for (var i = 0; i < PR.length; i++){
       dots += '<span class="pdot' + (i === primerIdx ? " cur" : "") + '" data-slide="' + i + '"></span>';
     }
     wrap.innerHTML =
       '<div class="card primer-card">' +
-        '<div class="primer-kicker">Before we start: why bother with git at all</div>' +
+        '<div class="primer-kicker">' + tr("Before we start: why bother with git at all", "Mielőtt belevágunk: minek egyáltalán a git?") + '</div>' +
         '<h2 class="primer-title">' + esc(P.title) + '</h2>' +
         '<div class="primer-art">' + ART[P.art]() + '</div>' +
-        '<div class="primer-scrollhint">Drag the drawing sideways to see the rest of it.</div>' +
+        '<div class="primer-scrollhint">' + tr("Drag the drawing sideways to see the rest of it.", "Húzd oldalra a rajzot, hogy a többit is lásd.") + '</div>' +
         '<p class="primer-body">' + P.body + '</p>' +
         '<div class="primer-nav">' +
           '<div class="pdots" id="pdots">' + dots + '</div>' +
-          '<button class="btn" id="p-back"' + (primerIdx === 0 ? " disabled" : "") + '>&larr; Back</button>' +
-          '<button class="btn primary" id="p-next">' + (last ? "Let's go →" : "Next →") + '</button>' +
-          (S.primerDone ? '<button class="btn" id="p-close">Close</button>' : "") +
+          '<button class="btn" id="p-back"' + (primerIdx === 0 ? " disabled" : "") + '>&larr; ' + tr("Back", "Vissza") + '</button>' +
+          '<button class="btn primary" id="p-next">' + (last ? tr("Let's go →", "Vágjunk bele →") : tr("Next →", "Tovább →")) + '</button>' +
+          (S.primerDone ? '<button class="btn" id="p-close">' + tr("Close", "Bezárás") + '</button>' : "") +
         '</div>' +
       '</div>';
     $("p-back").onclick = function(){ if (primerIdx > 0){ primerIdx--; renderPrimer(); } };
@@ -1255,7 +1406,7 @@
     for (var i = 0; i < N; i++){
       var el = document.createElement("span");
       el.className = "dot" + (S.done[i] ? " done" : "") + (S.lessonIndex === i ? " cur" : "");
-      el.title = "Lesson " + (i+1);
+      el.title = tr("Lesson " + (i+1), (i+1) + ". lecke");
       d.appendChild(el);
     }
   }
@@ -1290,7 +1441,7 @@
     if (!frame) return;
     var html = S.working["index.html"];
     if (html === undefined){
-      frame.srcdoc = "<p style='font:13px sans-serif;color:#9aa0a6;padding:12px'>No index.html in the working directory.</p>";
+      frame.srcdoc = "<p style='font:13px sans-serif;color:#9aa0a6;padding:12px'>" + tr("No index.html in the working directory.", "Nincs index.html a munkakönyvtárban.") + "</p>";
       return;
     }
     var css = S.working["style.css"] || "";
@@ -1312,7 +1463,7 @@
     stage.innerHTML = "";
     var ht = treeOf(S, head(S));
     var staged = Object.keys(S.index).filter(function(n){ return (S.index[n] || "") !== (ht[n] || ""); });
-    if (!staged.length) stage.appendChild(emptyEl("nothing staged yet"));
+    if (!staged.length) stage.appendChild(emptyEl(tr("nothing staged yet", "még semmi nincs a stagingben")));
     staged.forEach(function(n){ stage.appendChild(chip(n, "staged", false)); });
 
     local.innerHTML = "";
@@ -1322,7 +1473,7 @@
       card.className = "commit-card mono";
       card.innerHTML = "<span class=\"hash\">" + esc(h) + "</span> " + esc(S.commits[h].msg);
       local.appendChild(card);
-    } else local.appendChild(emptyEl("no commits"));
+    } else local.appendChild(emptyEl(tr("no commits", "nincs commit")));
 
     gh.innerHTML = "";
     var any = false;
@@ -1332,12 +1483,12 @@
       line.className = "repoline mono";
       var pill = "";
       var rel = relHere(k);
-      if (rel.ahead > 0) pill = " <span class=\"pill\" style=\"background:#fff7ed;color:#b45309;\">local " + rel.ahead + " commit(s) ahead</span>";
-      else if (rel.behind > 0) pill = " <span class=\"pill\" style=\"background:#eff6ff;color:#1d4ed8;\">pull needed: " + rel.behind + " commit(s)</span>";
+      if (rel.ahead > 0) pill = " <span class=\"pill\" style=\"background:#fff7ed;color:#b45309;\">" + tr("local " + rel.ahead + " commit(s) ahead", "helyben " + rel.ahead + " committal előrébb") + "</span>";
+      else if (rel.behind > 0) pill = " <span class=\"pill\" style=\"background:#eff6ff;color:#1d4ed8;\">" + tr("pull needed: " + rel.behind + " commit(s)", "pull kell: " + rel.behind + " commit") + "</span>";
       line.innerHTML = "origin/<b>" + esc(k) + "</b> &rarr; " + esc(S.origin[k]) + pill;
       gh.appendChild(line);
     });
-    if (!any) gh.appendChild(emptyEl("no push yet"));
+    if (!any) gh.appendChild(emptyEl(tr("no push yet", "még nem volt push")));
     renderPreview();
   }
 
@@ -1374,7 +1525,7 @@
     });
     var seen = {}, chain = [], c = head(S);
     while (c && !seen[c]){ seen[c] = true; chain.push(c); c = S.commits[c].parent; }
-    if (!chain.length){ box.appendChild(emptyEl("no commits")); return; }
+    if (!chain.length){ box.appendChild(emptyEl(tr("no commits", "nincs commit"))); return; }
     var wrap = document.createElement("div");
     for (var i = 0; i < chain.length; i++){
       var cm = chain[i];
@@ -1411,7 +1562,7 @@
     if (S.lessonIndex === 7) G.scenarioSetup(S);
     var L = currentLesson();
     t.textContent = L.title;
-    num.textContent = "Lesson " + (S.lessonIndex + 1) + " / " + N;
+    num.textContent = tr("Lesson " + (S.lessonIndex + 1) + " / " + N, "Lecke " + (S.lessonIndex + 1) + " / " + N);
     var flags = L.steps ? G.pollSubgoals(S) : null;
     goal.innerHTML = L.goal;
     if (L.goal2 && flags && flags[1]){
@@ -1434,20 +1585,20 @@
     var done = isDone();
     if (done){ S.done[S.lessonIndex] = true; }
     state.innerHTML = done
-      ? "<span class=\"ok\">&#10003; Done! You reached the goal.</span>"
-      : "<span class=\"wait\">&#9699; Keep going...</span>";
+      ? "<span class=\"ok\">&#10003; " + tr("Done! You reached the goal.", "Kész! Megvan a cél.") + "</span>"
+      : "<span class=\"wait\">&#9699; " + tr("Keep going...", "Folytasd...") + "</span>";
     hint.style.display = L.hasHints ? "" : "none";
     err.classList.remove("open");
     renderHint();
     btns.innerHTML = "";
     var back = document.createElement("button");
-    back.className = "btn"; back.textContent = "← Back";
+    back.className = "btn"; back.textContent = tr("← Back", "← Vissza");
     back.disabled = S.lessonIndex === 0;
     back.onclick = function(){ gotoLesson(S.lessonIndex - 1); };
     btns.appendChild(back);
     if (L.hasHints){
       var tip = document.createElement("button");
-      tip.className = "btn"; tip.textContent = "Hint";
+      tip.className = "btn"; tip.textContent = tr("Hint", "Tipp");
       tip.onclick = function(){
         hintIdx = (hintIdx + 1) % L.hints.length;
         renderHint();
@@ -1458,20 +1609,44 @@
       var np = document.createElement("button");
       np.className = "btn primary";
       var lastLesson = S.lessonIndex === N - 1;
-      np.textContent = lastLesson ? "Finish" : "Next lesson →";
+      np.textContent = lastLesson ? tr("Finish", "Befejezés") : tr("Next lesson →", "Következő lecke →");
       np.onclick = function(){ gotoLesson(S.lessonIndex + 1); };
       btns.appendChild(np);
     }
   }
 
+  var FIN_HU = "<b>Végigcsináltad, azzal a résszel együtt, amikor az oldal kétszer is leállt.</b> " +
+      "Hat parancs, és mindegyiket használtad:<br>" +
+      "<ul>" +
+      "<li><span class=\"mono\">git status</span>: mit változtattam?</li>" +
+      "<li><span class=\"mono\">git add</span> és <span class=\"mono\">git commit -m \"...\"</span>: mentési pont készítése</li>" +
+      "<li><span class=\"mono\">git push</span>: felhőmentés, így egy halott laptop semmibe nem kerül</li>" +
+      "<li><span class=\"mono\">git pull</span>: szedd le a többiek mentéseit, mielőtt az utadba kerülnek</li>" +
+      "<li><span class=\"mono\">git revert &lt;hash&gt;</span>: vissza az utolsó jó mentéshez, akkor is, ha a rossz már nyilvános</li>" +
+      "</ul>" +
+      "<p><b>Tedd őket ebbe a sorrendbe, és megvan egy munkanap:</b></p>" +
+      "<ul class=\"loop\">" +
+      "<li><span class=\"mono\">git pull</span><em>először a többiek munkája</em></li>" +
+      "<li><span class=\"mono\">szerkesztés</span><em>csináld meg, amit kértek</em></li>" +
+      "<li><span class=\"mono\">git status</span><em>mit változtattam?</em></li>" +
+      "<li><span class=\"mono\">git add</span><em>mi kerüljön a mentésbe</em></li>" +
+      "<li><span class=\"mono\">git commit -m \"...\"</span><em>a mentési pont</em></li>" +
+      "<li><span class=\"mono\">git push</span><em>és most már biztonságban van</em></li>" +
+      "</ul>" +
+      "<p>Ez nem a munka egyik része. Ez az egész kör, és holnap újra megy.</p>" +
+      "<p>Ez nem az egész git, és ez így rendben van. A GitHub weboldala és a többi akkor jön, " +
+      "amikor már lesz egy igazi projekted, amit oda tehetsz.</p>" +
+      "<p>Addig: nyomd meg az Újrakezdést, és csináld végig még egyszer, most tippek nélkül. " +
+      "Unalmasnak kell lennie. <b>Az unalom a cél.</b></p>";
+
   function renderFinish(t, num, goal, steps, state, hint, err, btns){
-    t.textContent = "Nice work!";
-    num.textContent = "Done";
+    t.textContent = tr("Nice work!", "Szép munka!");
+    num.textContent = tr("Done", "Kész");
     goal.innerHTML = "";
     steps.innerHTML = "";
     var fin = document.createElement("div");
     fin.className = "fin";
-    fin.innerHTML = "<b>You got through it, including the part where the site went down twice.</b> " +
+    fin.innerHTML = lang === "hu" ? FIN_HU : "<b>You got through it, including the part where the site went down twice.</b> " +
       "Six commands, and you have used every one of them:<br>" +
       "<ul>" +
       "<li><span class=\"mono\">git status</span>: what did I change?</li>" +
@@ -1500,11 +1675,11 @@
     err.classList.remove("open");
     btns.innerHTML = "";
     var ag = document.createElement("button");
-    ag.className = "btn"; ag.textContent = "← Back to the last lesson";
+    ag.className = "btn"; ag.textContent = tr("← Back to the last lesson", "← Vissza az utolsó leckéhez");
     ag.onclick = function(){ gotoLesson(N - 1); };
     btns.appendChild(ag);
     var rst = document.createElement("button");
-    rst.className = "btn primary"; rst.textContent = "↻ Reset";
+    rst.className = "btn primary"; rst.textContent = tr("↻ Reset", "↻ Újrakezdés");
     rst.onclick = function(){ doReset(); };
     btns.appendChild(rst);
   }
@@ -1528,7 +1703,7 @@
       hint.style.display = "none";
       return;
     }
-    hint.innerHTML = "<b>Hint " + (hintIdx + 1) + "/" + L.hints.length + ":</b> " + L.hints[hintIdx];
+    hint.innerHTML = "<b>" + tr("Hint", "Tipp") + " " + (hintIdx + 1) + "/" + L.hints.length + ":</b> " + L.hints[hintIdx];
   }
 
   function updateAccept(){
@@ -1627,7 +1802,7 @@
   $("paste-load").onclick = function(){
     try {
       var nS = G.normalize(decodeCode($("paste-text").value));
-      if (!confirm("Restore this progress? Your current progress will be overwritten.")) return;
+      if (!confirm(tr("Restore this progress? Your current progress will be overwritten.", "Visszaállítod ezt a haladást? A mostani felülíródik."))) return;
       S = nS;
       save();
       hintIdx = 0;
@@ -1635,7 +1810,7 @@
       closeModals();
       renderAll();
     } catch(e){
-      alert("The code is invalid. Make sure you copied the entire code.");
+      alert(tr("The code is invalid. Make sure you copied the entire code.", "Hibás a kód. Nézd meg, hogy az egészet kimásoltad-e."));
     }
   };
   $("paste-close").onclick = closeModals;
@@ -1643,7 +1818,7 @@
 
   $("btn-reset").onclick = doReset;
   function doReset(){
-    if (!confirm("Reset all progress and start over?")) return;
+    if (!confirm(tr("Reset all progress and start over?", "Törlöd az összes haladást, és elölről kezded?"))) return;
     try { localStorage.removeItem(KEY); } catch(e){}
     S = G.normalize(null);
     hintIdx = 0;
@@ -1662,7 +1837,10 @@
     renderTerm();
   }
 
+  $("btn-lang").onclick = function(){ setLanguage(lang === "hu" ? "en" : "hu"); };
+
   primerOpen = !S.primerDone;
+  applyStatic();
   renderAll();
   if (!primerOpen) termIn.focus();
 })();

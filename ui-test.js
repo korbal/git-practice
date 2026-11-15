@@ -309,5 +309,38 @@ doc.getElementById("code-close").click();
   K("reset clears the dots", dd.querySelectorAll("#dots .dot.done").length === 0);
 }
 
+// ---------- Hungarian mode
+{
+  const dh = new JSDOM(html, { runScripts: "dangerously", pretendToBeVisual: true, url: "https://gyak-hu.test/?lang=hu" });
+  const wh = dh.window, d = wh.document;
+  wh.confirm = () => true;
+  K("?lang=hu sets the page language", d.documentElement.lang === "hu");
+  K("?lang=hu shows the Hungarian primer", d.querySelector(".primer-title").textContent === wh.__GYT.PRIMER_HU[0].title);
+  K("primer drawing is Hungarian", d.querySelector(".primer-art").innerHTML.includes("Egy játékban"));
+  K("header buttons are Hungarian", d.getElementById("btn-why").textContent === "Minek a git?");
+  K("language button offers English", d.getElementById("btn-lang").textContent === "In English");
+  clearPrimer(d);
+  K("lesson 1 title is Hungarian", d.getElementById("lesson-title").textContent.startsWith("Mit változtattam"));
+  K("box titles are Hungarian", d.querySelector(".box-title").textContent.includes("Munkakönyvtár"));
+  K("empty staging box is Hungarian", d.getElementById("box-stage").textContent.includes("stagingben"));
+  const chipH = d.querySelector('#box-work .chip[data-file="index.html"]');
+  chipH.click();
+  d.getElementById("ed-text").value = d.getElementById("ed-text").value.replace("Pixel Team</h1>", "Szia</h1>");
+  d.getElementById("ed-save").click();
+  const inp = d.getElementById("term-in");
+  inp.value = "git status";
+  inp.dispatchEvent(new wh.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  K("lesson 1 passes in Hungarian", d.getElementById("lesson-state").textContent.includes("Kész"));
+  K("git status output stays English", d.getElementById("termout").textContent.includes("Changes not staged for commit"));
+  K("next button is Hungarian", [...d.querySelectorAll("#lesson-buttons .btn")].some(b => b.textContent.includes("Következő lecke")));
+  K("language choice is remembered", wh.localStorage.getItem("git-gyakorlo-lang") === "hu");
+  d.getElementById("btn-lang").click();
+  K("switching back restores English lesson text", d.getElementById("lesson-title").textContent.startsWith("What did I just change"));
+  K("switching back restores English static text", d.getElementById("btn-why").textContent === "Why git?" && d.querySelector(".box-title").textContent.includes("Working directory"));
+  K("switching keeps progress", d.getElementById("lesson-state").textContent.includes("Done"));
+  K("switching writes the language to the URL", wh.location.search.includes("lang=en"));
+  K("switching back offers Hungarian again", d.getElementById("btn-lang").textContent === "Magyarul");
+}
+
 console.log("\n" + (fails ? fails + " FAILURES" : "ALL PASS"));
 process.exit(fails ? 1 : 0);

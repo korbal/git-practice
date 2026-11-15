@@ -61,6 +61,8 @@ The finish screen used to name branching and link out to Learn Git Branching. It
 
 **English.** The repo name is Hungarian, the app is not. Józsi is the one Hungarian word in it, on purpose.
 
+**Hungarian on request.** `?lang=hu` in the URL, or the Magyarul button in the header, switches the trainer's own words to Hungarian: primer, drawings, lessons, hints, buttons, the jokes. The choice is remembered per browser (`git-gyakorlo-lang`) and written back to the URL. Command output that real git prints stays in English, because that is what students meet in a real terminal; the Hungarian hints explain the English phrases they will see. The Hungarian text lives beside the English in the engine (`PRIMER_HU`, `LESSONS_HU`, `SHELL_HU`, `tr()`), and static page text carries it in `data-hu` attributes.
+
 **One metaphor, carried all the way through.** A commit is a save point, `git log` is the save slots, `git revert` loads an older save, `git push` is the cloud save, `git pull` downloads the other player's saves, and Józsi saving over you is what makes lesson 6 land. The primer opens on it and every lesson after keeps the same words. New copy uses that vocabulary or it weakens the parts that already do.
 
 **Józsi stays out of the engine.** He is named in lesson text and in the `git blame` reply only. Command output keeps matching real git, because that is what students meet next week.
@@ -107,8 +109,8 @@ The `sandbox` attribute is bare, with no value. That blocks scripts, which matte
 ## Tests
 
 ```
-npm test         # engine: 107 checks, runs in a vm, no DOM
-npm run test:ui  # UI: 133 checks, jsdom, walks the whole app end to end
+npm test         # engine: 116 checks, runs in a vm, no DOM
+npm run test:ui  # UI: 150 checks, jsdom, walks the whole app end to end
 ```
 
 The UI suite clicks through the primer, does every lesson in order, reads hashes out of the rendered terminal, feeds them back to `git revert`, checks the preview's `srcdoc` after each change, and verifies the progress code survives a round trip. Both suites read `index.html` directly, so there is nothing to keep in sync.

@@ -279,5 +279,24 @@ K("ended around commit 15", nCommits() === G.HISTORY.length + 7, String(nCommits
   K("normalize rebuilds a junk state", G.normalize(null).branches.main !== undefined);
 }
 
+// ---------- Hungarian mode
+{
+  K("Hungarian primer has every slide", G.PRIMER_HU.length === G.PRIMER.length);
+  K("Hungarian primer uses the same drawings in the same order", G.PRIMER_HU.every((p, i) => p.art === G.PRIMER[i].art));
+  K("Hungarian lessons match the English ones", G.LESSONS_HU.length === G.LESSONS.length &&
+    G.LESSONS_HU.every((l, i) => l.hasHints === G.LESSONS[i].hasHints && l.hints.length === G.LESSONS[i].hints.length &&
+      (l.steps || []).length === (G.LESSONS[i].steps || []).length && !!l.goal2 === !!G.LESSONS[i].goal2));
+  const H = G.newGame();
+  const h = (l) => G.execGit(H, l).out.join("\n");
+  G.setLang("hu");
+  K("setLang switches the trainer's own words", h("ls").includes("doboz"));
+  K("git blame answers in Hungarian", h("git blame").includes("Józsi volt"));
+  K("real git output stays English in Hungarian mode", h("git status").includes("nothing to commit, working tree clean"));
+  K("shell errors stay English in Hungarian mode", h("foo").includes("command not found"));
+  K("revert usage hint is Hungarian", h("git revert").includes("tipp:"));
+  G.setLang("xx");
+  K("an unknown language falls back to English", G.getLang() === "en" && h("ls").includes("four boxes"));
+}
+
 console.log("\n" + (fails ? fails + " FAILURES" : "ALL PASS") + " — " + id + " checks");
 process.exit(fails ? 1 : 0);
